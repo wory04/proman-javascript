@@ -30,21 +30,22 @@ export let dom = {
         // shows boards appending them to #boards div
         // it adds necessary event listeners also
 
-        let boardList = '';
+        let elementToExtend = document.getElementById('boards');
 
-        for(let board of boards){
-            boardList += `
-                <li>${board.title}</li>
-            `;
+        for (let board of boards) {
+            let newBoard = this.boardTemplate(board);
+            let currentBoard = this._appendToElement(elementToExtend, newBoard , false);
+            for (let statuses of board.status) {
+                let newStatus = this.checkStatuses(statuses);
+                this._appendToElement(currentBoard, newStatus, false);
+                for (let card of statuses.cards){
+                    let newCard = this.checkCards(card);
+                    let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                    this._appendToElement(cardContainer, newCard, false);
+                }
+            }
         }
 
-        const outerHtml = `
-            <ul class="board-container">
-                ${boardList}
-            </ul>
-        `;
-
-        this._appendToElement(document.querySelector('#boards'), outerHtml);
     },
     loadCards: function (boardId) {
         // retrieves cards and makes showCards called
@@ -54,4 +55,47 @@ export let dom = {
         // it adds necessary event listeners also
     },
     // here comes more features
+
+
+     boardTemplate: function (board){
+        return `
+        <div id=${board.id} class="board">
+            <div class="board-header">
+                <span class="board-title">${board.title}</span>
+                <button class="add-card">Add Card</button>
+                <button class="open-board">Open Board</button>
+            </div>    
+        </div>
+        
+      `
+     },
+
+
+    statusTemplate: function (status) {
+        return `<div id="${status.id}" class="status">
+                        <div class="status-header"> 
+                            <span class="status-title">${status.title}</span>
+                        </div>
+                        <div class="cards"></div>   
+                    </div>                 
+    
+                    `
+    },
+
+
+    cardTemplate: function (card) {
+        return `<div id="${card.id}">${card.title}</div>`;
+    },
+
+
+    checkStatuses: function (statuses){
+        return `${statuses ? this.statusTemplate(statuses) : ''}`
+    },
+
+
+    checkCards: function (card){
+        return `${card ? this.cardTemplate(card) : ''}`
+    },
+
+
 };

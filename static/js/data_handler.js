@@ -60,8 +60,7 @@ export let dataHandler = {
     createNewCard: function (statusId, callback) {
         const newCardStatus = {'statusId': `${statusId}`};
         const newCardUrl = '/card';
-
         return this._api_post(newCardUrl, newCardStatus, callback);
-    }
+    },
     // here comes more features
 };

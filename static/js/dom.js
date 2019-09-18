@@ -1,5 +1,5 @@
 // It uses data_handler.js to visualize elements
-import { dataHandler } from "./data_handler.js";
+import {dataHandler} from "./data_handler.js";
 
 export let dom = {
     _appendToElement: function (elementToExtend, textToAppend, prepend = false) {
@@ -14,7 +14,6 @@ export let dom = {
                 elementToExtend.appendChild(childNode);
             }
         }
-
         return elementToExtend.lastChild;
     },
     init: function () {
@@ -22,7 +21,7 @@ export let dom = {
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
-        dataHandler.getBoards(function(boards){
+        dataHandler.getBoards(function (boards) {
             dom.showBoards(boards);
         });
     },
@@ -34,11 +33,11 @@ export let dom = {
 
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
-            let currentBoard = this._appendToElement(elementToExtend, newBoard , false);
+            let currentBoard = this._appendToElement(elementToExtend, newBoard, false);
             for (let statuses of board.statuses) {
                 let newStatus = this.checkStatuses(statuses);
                 this._appendToElement(currentBoard, newStatus, false);
-                for (let card of statuses.cards){
+                for (let card of statuses.cards) {
                     let newCard = this.checkCards(card);
                     let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
                     this._appendToElement(cardContainer, newCard, false);
@@ -46,6 +45,13 @@ export let dom = {
             }
         }
 
+        let addCardButtons = document.querySelectorAll('.add-card');
+
+        for (let addCardButton of addCardButtons) {
+            addCardButton.addEventListener('click', function (event) {
+                dom.newCardHandler(event);
+            })
+        }
     },
     loadCards: function (boardId) {
         // retrieves cards and makes showCards called
@@ -55,12 +61,17 @@ export let dom = {
         // it adds necessary event listeners also
     },
     // here comes more features
-    newCardHandler: function(event) {
-        const statusId = event.target.parentElement.nextSibling.id;
+    newCardHandler: function (event) {
+        const statusId = event.target.parentElement.nextElementSibling.id;
+        const currentStatus = event.target.parentElement.nextElementSibling;
 
-        dataHandler.createNewCard(statusId, this.cardTemplate)
+        let newCard = dataHandler.createNewCard(statusId, this.cardTemplate);
+
+        this._appendToElement(currentStatus, newCard, false)
+
     },
-     boardTemplate: function (board){
+
+    boardTemplate: function (board) {
         return `
         <div id=${board.id} class="board">
             <div class="board-header">
@@ -69,9 +80,8 @@ export let dom = {
                 <button class="open-board">Open Board</button>
             </div>    
         </div>
-        
       `
-     },
+    },
 
 
     statusTemplate: function (status) {
@@ -80,8 +90,7 @@ export let dom = {
                             <span class="status-title">${status.title}</span>
                         </div>
                         <div class="cards"></div>   
-                    </div>                 
-    
+                    </div>
                     `
     },
 
@@ -91,12 +100,12 @@ export let dom = {
     },
 
 
-    checkStatuses: function (statuses){
+    checkStatuses: function (statuses) {
         return `${statuses ? this.statusTemplate(statuses) : ''}`
     },
 
 
-    checkCards: function (card){
+    checkCards: function (card) {
         return `${card ? this.cardTemplate(card) : ''}`
     },
 

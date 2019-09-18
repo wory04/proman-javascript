@@ -26,3 +26,18 @@ def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
     result = cursor.fetchall()
 
     return result
+
+
+@db_connection.connection_handler
+def insert_into_inner_table(cursor, table, id_type, id_value):
+    query_to_insert_into_inner_table = sql.SQL('''
+    INSERT INTO {} ({}) VALUES ({}) RETURNING *
+    ''').format(
+        sql.Identifier(table),
+        sql.Identifier(id_type),
+        sql.SQL(id_value)
+        )
+    cursor.execute(query_to_insert_into_inner_table)
+    result = cursor.fetchone()
+
+    return result

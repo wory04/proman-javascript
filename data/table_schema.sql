@@ -10,7 +10,7 @@ DROP SEQUENCE IF EXISTS public.card_id_seq;
 
 CREATE TABLE board (
     id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL
+    title VARCHAR(200) NOT NULL DEFAULT 'New Board'
 );
 
 CREATE TABLE status (

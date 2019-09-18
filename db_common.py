@@ -1,0 +1,28 @@
+import db_connection
+from psycopg2 import sql
+
+
+@db_connection.connection_handler
+def get_all_from_table(cursor, table):
+    query_for_func = sql.SQL('SELECT * FROM {}').format(
+                     sql.Identifier(table))
+    cursor.execute(query_for_func)
+
+    all_from_table = cursor.fetchall()
+
+    return all_from_table
+
+
+@db_connection.connection_handler
+def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
+    query_for_all_from_inner_by_outer_table = sql.SQL('''
+        SELECT * FROM {} WHERE {} = {};
+        ''').format(
+            sql.Identifier(table),
+            sql.Identifier(id_type),
+            sql.SQL(id_value),
+            )
+    cursor.execute(query_for_all_from_inner_by_outer_table)
+    result = cursor.fetchall()
+
+    return result

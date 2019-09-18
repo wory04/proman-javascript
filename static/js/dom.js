@@ -65,9 +65,9 @@ export let dom = {
         const statusId = event.target.parentElement.nextElementSibling.id;
         const currentStatus = event.target.parentElement.nextElementSibling;
 
-        let newCard = dataHandler.createNewCard(statusId, this.cardTemplate);
-
-        this._appendToElement(currentStatus, newCard, false)
+        dataHandler.createNewCard(statusId, this.cardTemplate).then(
+            (newCard) => this._appendToElement(currentStatus, newCard, false)
+        );
 
     },
 

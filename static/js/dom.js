@@ -55,8 +55,11 @@ export let dom = {
         // it adds necessary event listeners also
     },
     // here comes more features
+    newCardHandler: function(event) {
+        const statusId = event.target.parentElement.nextSibling.id;
 
-
+        dataHandler.createNewCard(statusId, this.cardTemplate)
+    },
      boardTemplate: function (board){
         return `
         <div id=${board.id} class="board">

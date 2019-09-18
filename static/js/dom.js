@@ -35,7 +35,7 @@ export let dom = {
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
             let currentBoard = this._appendToElement(elementToExtend, newBoard , false);
-            for (let statuses of board.status) {
+            for (let statuses of board.statuses) {
                 let newStatus = this.checkStatuses(statuses);
                 this._appendToElement(currentBoard, newStatus, false);
                 for (let card of statuses.cards){

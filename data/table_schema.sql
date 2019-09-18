@@ -15,7 +15,7 @@ CREATE TABLE board (
 
 CREATE TABLE status (
     id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
+    title VARCHAR(200) NOT NULL DEFAULT 'New Card',
     board_id INTEGER NOT NULL
 );
 

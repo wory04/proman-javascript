@@ -23,6 +23,12 @@ def get_boards():
     return data_handler.get_boards_with_content()
 
 
+@app.route("/board", methods=['POST'])
+@json_response
+def create_board():
+    return data_handler.create_new_board()
+
+
 def main():
     app.run(debug=True)
 

@@ -1,5 +1,5 @@
 // It uses data_handler.js to visualize elements
-import { dataHandler } from "./data_handler.js";
+import {dataHandler} from "./data_handler.js";
 
 export let dom = {
     _appendToElement: function (elementToExtend, textToAppend, prepend = false) {
@@ -19,10 +19,12 @@ export let dom = {
     },
     init: function () {
         // This function should run once, when the page is loaded.
+        let addButton = document.querySelector('.add-board');
+        addButton.addEventListener('click', this.newBoardHandler);
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
-        dataHandler.getBoards(function(boards){
+        dataHandler.getBoards(function (boards) {
             dom.showBoards(boards);
         });
     },
@@ -34,16 +36,24 @@ export let dom = {
 
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
-            let currentBoard = this._appendToElement(elementToExtend, newBoard , false);
+            let currentBoard = this._appendToElement(elementToExtend, newBoard, false);
             for (let statuses of board.statuses) {
-                let newStatus = this.checkStatuses(statuses);
-                this._appendToElement(currentBoard, newStatus, false);
-                for (let card of statuses.cards){
-                    let newCard = this.checkCards(card);
-                    let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
-                    this._appendToElement(cardContainer, newCard, false);
+                if (statuses.length !== 0) {
+                    let newStatus = this.statusTemplate(statuses);
+                    this._appendToElement(currentBoard, newStatus, false);
+                }
+                for (let card of statuses.cards) {
+                    if (card.length !== 0) {
+                        let newCard = this.cardTemplate(card);
+                        let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                        this._appendToElement(cardContainer, newCard, false);
+                    }
                 }
             }
+        }
+        let openButtons = document.querySelectorAll('.open-board');
+        for (let openButton of openButtons) {
+            openButton.addEventListener('click', this.openBoardHandler);
         }
 
     },
@@ -55,9 +65,20 @@ export let dom = {
         // it adds necessary event listeners also
     },
     // here comes more features
+    newBoardHandler: function () {
+        let boards = document.querySelector('#boards');
+        dataHandler.createNewBoard(dom.boardTemplate).then(
+            (newBoard) => dom._appendToElement(boards, newBoard, false)
+        )
 
+    },
 
-     boardTemplate: function (board){
+    openBoardHandler: function (event) {
+        let clickedBoard = event.currentTarget().parentElement.parentElement;
+        clickedBoard.classList.toggle('hide');
+    },
+
+    boardTemplate: function (board) {
         return `
         <div id=${board.id} class="board">
             <div class="board-header">
@@ -68,7 +89,7 @@ export let dom = {
         </div>
         
       `
-     },
+    },
 
 
     statusTemplate: function (status) {
@@ -88,12 +109,12 @@ export let dom = {
     },
 
 
-    checkStatuses: function (statuses){
+    checkStatuses: function (statuses) {
         return `${statuses ? this.statusTemplate(statuses) : ''}`
     },
 
 
-    checkCards: function (card){
+    checkCards: function (card) {
         return `${card ? this.cardTemplate(card) : ''}`
     },
 

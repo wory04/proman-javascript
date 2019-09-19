@@ -85,11 +85,11 @@ export let dom = {
     },
 
     newCardHandler: function (event) {
-        const statusId = event.target.parentElement.nextElementSibling.firstElementChild.id;
-        const currentStatus = event.target.parentElement.nextElementSibling.firstElementChild;
+        const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
+        const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
         dataHandler.createNewCard(statusId, this.cardTemplate).then(
-            (newCard) => this._appendToElement(currentStatus, newCard, false)
+            (newCard) => this._appendToElement(statusContainer, newCard, false)
         );
     },
 

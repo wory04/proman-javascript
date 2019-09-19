@@ -35,7 +35,7 @@ export let dom = {
 
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
-            this._appendToElement(elementToExtend, newBoard , false);
+            this._appendToElement(elementToExtend, newBoard, false);
             for (let statuses of board.statuses) {
                 if (statuses.length !== 0) {
                     let newStatus = this.statusTemplate(statuses);
@@ -57,11 +57,15 @@ export let dom = {
         }
 
         let addCardButtons = document.querySelectorAll('.add-card');
-
         for (let addCardButton of addCardButtons) {
             addCardButton.addEventListener('click', function (event) {
                 dom.newCardHandler(event);
             })
+        }
+
+        let boardNames = document.querySelectorAll('.board-title');
+        for (let boardName of boardNames) {
+            boardName.addEventListener('click', this.renameBoardHandler)
         }
     },
     loadCards: function (boardId) {
@@ -91,6 +95,38 @@ export let dom = {
         dataHandler.createNewCard(statusId, this.cardTemplate).then(
             (newCard) => this._appendToElement(statusContainer, newCard, false)
         );
+    },
+    renameBoardHandler: function (event) {
+        const currentBoardName = event.target.innerText;
+        event.target.innerHTML = `<input type="text" placeholder="${currentBoardName}" required maxlength="12">`;
+        let boardNames = document.querySelectorAll('.board-title');
+        for (let boardName of boardNames) {
+            boardName.removeEventListener('click', dom.renameBoardHandler)
+        }
+
+        const inputField = document.querySelector('input');
+        const boardId = event.target.parentElement.parentElement.id;
+        inputField.addEventListener('keyup', function (event) {
+            if (event.code === 'Enter') {
+                try {
+                    if (event.target.checkValidity()) {
+                        dataHandler.renameBoard(boardId, inputField.value)
+                            .then(response => event.target.parentElement.innerHTML = response.title)
+                            .then(function () {
+                                let boardNames = document.querySelectorAll('.board-title');
+                                for (let boardName of boardNames) {
+                                    boardName.addEventListener('click', dom.renameBoardHandler)
+                                }
+                            })
+                    } else {
+                        (event.target.parentElement.innerHTML = currentBoardName)
+                    }
+                } catch (e) {
+                    if (e instanceof TypeError) {
+                    }
+                }
+            }
+        })
     },
 
     boardTemplate: function (board) {

@@ -18,10 +18,10 @@ def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
     query_for_all_from_inner_by_outer_table = sql.SQL('''
         SELECT * FROM {} WHERE {} = {};
         ''').format(
-            sql.Identifier(table),
-            sql.Identifier(id_type),
-            sql.SQL(id_value),
-            )
+        sql.Identifier(table),
+        sql.Identifier(id_type),
+        sql.SQL(id_value),
+    )
     cursor.execute(query_for_all_from_inner_by_outer_table)
     result = cursor.fetchall()
 
@@ -38,6 +38,19 @@ def insert_into_inner_table(cursor, table, id_type, id_value):
         sql.SQL(id_value)
         )
     cursor.execute(query_to_insert_into_inner_table)
+    result = cursor.fetchone()
+
+    return result
+
+
+@db_connection.connection_handler
+def create_new_board(cursor):
+    cursor.execute(
+        sql.SQL("""
+                    INSERT INTO board
+                    DEFAULT VALUES 
+                    RETURNING *;
+                    """))
     result = cursor.fetchone()
 
     return result

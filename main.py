@@ -33,6 +33,12 @@ def add_new_card():
     return new_card
 
 
+@app.route("/board", methods=['POST'])
+@json_response
+def create_board():
+    return data_handler.create_new_board()
+
+
 def main():
     app.run(debug=True)
 

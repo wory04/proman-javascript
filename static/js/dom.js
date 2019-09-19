@@ -18,6 +18,8 @@ export let dom = {
     },
     init: function () {
         // This function should run once, when the page is loaded.
+        let addButton = document.querySelector('.board-add');
+        addButton.addEventListener('click', this.newBoardHandler);
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -35,15 +37,23 @@ export let dom = {
             let newBoard = this.boardTemplate(board);
             this._appendToElement(elementToExtend, newBoard , false);
             for (let statuses of board.statuses) {
-                let newStatus = this.checkStatuses(statuses);
-                let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
-                this._appendToElement(statusContainer, newStatus, false);
-                for (let card of statuses.cards) {
-                    let newCard = this.checkCards(card);
-                    let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
-                    this._appendToElement(cardContainer, newCard, false);
+                if (statuses.length !== 0) {
+                    let newStatus = this.statusTemplate(statuses);
+                    let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
+                    this._appendToElement(statusContainer, newStatus, false);
+                    for (let card of statuses.cards) {
+                        if (card.length !== 0) {
+                            let newCard = this.cardTemplate(card);
+                            let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                            this._appendToElement(cardContainer, newCard, false);
+                        }
+                    }
                 }
             }
+        }
+        let openButtons = document.querySelectorAll('.open-board');
+        for (let openButton of openButtons) {
+            openButton.addEventListener('click', this.openBoardHandler);
         }
 
         let addCardButtons = document.querySelectorAll('.add-card');
@@ -62,6 +72,18 @@ export let dom = {
         // it adds necessary event listeners also
     },
     // here comes more features
+    newBoardHandler: function () {
+        let boards = document.querySelector('#boards');
+        dataHandler.createNewBoard(dom.boardTemplate).then(
+            (newBoard) => dom._appendToElement(boards, newBoard, false)
+        )
+    },
+
+    openBoardHandler: function (event) {
+        let clickedBoard = event.target.parentElement.nextElementSibling;
+        clickedBoard.classList.toggle('hide');
+    },
+
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
@@ -69,7 +91,6 @@ export let dom = {
         dataHandler.createNewCard(statusId, this.cardTemplate).then(
             (newCard) => this._appendToElement(statusContainer, newCard, false)
         );
-
     },
 
     boardTemplate: function (board) {
@@ -104,16 +125,4 @@ export let dom = {
                 <div class="card-title">${card.title}</div>
             </div>`
     },
-
-
-    checkStatuses: function (statuses) {
-        return `${statuses ? this.statusTemplate(statuses) : ''}`
-    },
-
-
-    checkCards: function (card) {
-        return `${card ? this.cardTemplate(card) : ''}`
-    },
-
-
 };

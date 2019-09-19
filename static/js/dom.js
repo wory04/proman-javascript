@@ -145,12 +145,12 @@ export let dom = {
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const boardId = event.target.parentElement.parentElement.id;
+        const parentId = event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
                 if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameBoard(boardId, inputField.value)
+                            dataHandler.renameTitle(parentId, inputField.value, event.target.parentElement.parentElement.parentElement.className)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();

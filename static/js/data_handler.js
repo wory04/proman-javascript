@@ -81,10 +81,10 @@ export let dataHandler = {
         const newCardUrl = '/card';
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
-    // here comes more features
-    renameBoard: function(boardId, newBoardName){
-        const newBoardNameData = {'id': boardId, 'title': newBoardName};
-        const url = `/board/${boardId}`;
-        return this._api_patch(url, newBoardNameData);
+
+    renameTitle: function(parentId, newName, type){
+        const newNameData = {'id': parentId, 'title': newName};
+        const url = `/${type}/${parentId}`;
+        return this._api_patch(url, newNameData);
     }
 };

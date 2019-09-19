@@ -33,7 +33,14 @@ def add_new_card():
     return new_card
 
 
-@app.route("/board", methods=['POST'])
+@app.route('/status', methods=['POST'])
+@json_response
+def create_status():
+    new_status_board = request.get_json()['boardId']
+    return data_handler.create_new_status(new_status_board)
+
+
+@app.route('/board', methods=['POST'])
 @json_response
 def create_board():
     return data_handler.create_new_board()

@@ -39,6 +39,20 @@ def create_board():
     return data_handler.create_new_board()
 
 
+@app.route('/board/<id>', methods=['PATCH'])
+@json_response
+def rename_board(id):
+    board_data = request.get_json()
+    return data_handler.rename_board(board_data)
+
+
+@app.route('/status/<id>', methods=['PATCH'])
+@json_response
+def rename_status(id):
+    status_data = request.get_json()
+    return data_handler.rename_status(status_data)
+
+
 def main():
     app.run(debug=True)
 

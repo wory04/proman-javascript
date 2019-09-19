@@ -78,6 +78,10 @@ button{
     background-color: rgb(255, 233, 209, 0.6);
 }
 
+.board-body.hide{
+    display: none;
+}
+
 .status{
     padding: 10px;
     flex: 1;

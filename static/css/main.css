@@ -62,6 +62,11 @@ button{
     display: inline-block;
     font-size: 20px;
 }
+
+.board-title:hover, .status-title:hover{
+    cursor: pointer;
+}
+
 .board-title, .board-add, .add-status, .open-board{
     display: inline-block;
     margin-left: 20px;

@@ -74,22 +74,29 @@ export let dom = {
     // here comes more features
     newBoardHandler: function () {
         let boards = document.querySelector('#boards');
-        dataHandler.createNewBoard(dom.boardTemplate).then(
-            (newBoard) => dom._appendToElement(boards, newBoard, false)
-        )
+        dataHandler.createNewBoard(dom.boardTemplate)
+            .then((newBoard) => dom._appendToElement(boards, newBoard, false))
+            .then((currentBoard) => currentBoard.querySelector('.add-card').addEventListener('click', this.newCardHandler))
     },
 
     openBoardHandler: function (event) {
         let clickedBoard = event.target.parentElement.nextElementSibling;
         clickedBoard.classList.toggle('hide');
+        if (clickedBoard.classList.contains('hide')){
+            event.target.classList.remove('fa-chevron-up');
+            event.target.classList.add('fa-chevron-down');
+        } else {
+            event.target.classList.remove('fa-chevron-down');
+            event.target.classList.add('fa-chevron-up');
+        }
     },
 
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.nextElementSibling.firstElementChild.id;
         const currentStatus = event.target.parentElement.nextElementSibling.firstElementChild;
 
-        dataHandler.createNewCard(statusId, this.cardTemplate).then(
-            (newCard) => this._appendToElement(currentStatus, newCard, false)
+        dataHandler.createNewCard(statusId, this.cardTemplate)
+            .then((newCard) => this._appendToElement(currentStatus, newCard, false)
         );
     },
 
@@ -99,7 +106,7 @@ export let dom = {
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
                 <button class="add-card">Add Card</button>
-                <div class="open-board fas fa-angle-down"></div>
+                <div class="open-board fas fa-chevron-up"></div>
             </div>
             <div class="board-body"></div>   
         </div>

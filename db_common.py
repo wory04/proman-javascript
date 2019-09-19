@@ -5,7 +5,7 @@ from psycopg2 import sql
 @db_connection.connection_handler
 def get_all_from_table(cursor, table):
     query_for_func = sql.SQL('SELECT * FROM {}').format(
-                     sql.Identifier(table))
+        sql.Identifier(table))
     cursor.execute(query_for_func)
 
     all_from_table = cursor.fetchall()
@@ -36,7 +36,7 @@ def insert_into_inner_table(cursor, table, id_type, id_value):
         sql.Identifier(table),
         sql.Identifier(id_type),
         sql.SQL(id_value)
-        )
+    )
     cursor.execute(query_to_insert_into_inner_table)
     result = cursor.fetchone()
 
@@ -51,6 +51,27 @@ def create_new_board(cursor):
                     DEFAULT VALUES 
                     RETURNING *;
                     """))
+    result = cursor.fetchone()
+
+    return result
+
+
+@db_connection.connection_handler
+def update_title_by_id(cursor, id_number, title, table):
+    cursor.execute(
+        sql.SQL(
+            ("""
+        UPDATE {}
+        SET title = {}
+        WHERE id = {}
+        RETURNING *;
+        """).format(
+                sql.Identifier(table),
+                sql.SQL(title),
+                sql.SQL(id_number)
+            )
+        )
+    )
     result = cursor.fetchone()
 
     return result

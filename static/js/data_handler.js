@@ -27,6 +27,16 @@ export let dataHandler = {
             .then(response => response.json())
             .then(json_response => callback(json_response))
     },
+    _api_patch: function (url, data) {
+        return fetch(url, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+    },
     init: function () {
     },
     getBoards: function (callback) {
@@ -72,4 +82,9 @@ export let dataHandler = {
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
     // here comes more features
+    renameBoard: function(boardId, newBoardName){
+        const newBoardNameData = {'id': boardId, 'title': newBoardName};
+        const url = `/board/${boardId}`;
+        return this._api_patch(url, newBoardNameData);
+    }
 };

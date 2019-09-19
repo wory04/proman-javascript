@@ -27,16 +27,27 @@ export let dom = {
             dom.showBoards(boards);
         });
     },
-    addBoardNamesEventListener: function () {
+    addNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
         for (let boardName of boardNames) {
-            boardName.addEventListener('click', this.renameBoardHandler);
+            boardName.addEventListener('click', dom.renameHandler);
         }
+
+        let statusNames = document.querySelectorAll('.status-title');
+        for (let statusName of statusNames) {
+            statusName.addEventListener('click', dom.renameHandler);
+        }
+
     },
-    removeBoardNamesEventListener: function () {
+    removeNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
         for (let boardName of boardNames) {
-            boardName.removeEventListener('click', dom.renameBoardHandler);
+            boardName.removeEventListener('click', dom.renameHandler);
+        }
+
+        let statusNames = document.querySelectorAll('.status-title');
+        for (let statusName of statusNames) {
+            statusName.removeEventListener('click', dom.renameHandler);
         }
     },
     showBoards: function (boards) {
@@ -79,21 +90,16 @@ export let dom = {
             addCardButton.addEventListener('click', this.newCardHandler)
         }
 
-        this.addBoardNamesEventListener();
+        this.addNamesEventListener();
     },
-    loadCards: function (boardId) {
-        // retrieves cards and makes showCards called
-    },
-    showCards: function (cards) {
-        // shows the cards of a board
-        // it adds necessary event listeners also
-    },
+
     addEventListenersToBoard: function (currentBoard) {
         currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);
         currentBoard.querySelector('.add-status').addEventListener('click', dom.newStatusHandler);
         currentBoard.querySelector('.open-board').addEventListener('click', dom.openBoardHandler);
+        currentBoard.querySelector('.board-title').addEventListener('click', dom.renameHandler);
     },
-    // here comes more features
+
     newBoardHandler: function () {
         let boards = document.querySelector('#boards');
         dataHandler.createNewBoard(dom.boardTemplate)
@@ -101,6 +107,7 @@ export let dom = {
             .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
             .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
             .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
+            .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler))
     },
 
     openBoardHandler: function (event) {
@@ -120,8 +127,8 @@ export let dom = {
         const statusContainer = event.target.parentElement.nextElementSibling;
 
         dataHandler.createNewStatus(boardId, dom.statusTemplate)
-            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false)
-        );
+            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false))
+            .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler));
     },
 
     newCardHandler: function (event) {
@@ -132,10 +139,10 @@ export let dom = {
             .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
         );
     },
-    renameBoardHandler: function (event) {
-        const currentBoardName = event.target.innerText;
-        event.target.innerHTML = `<input type="text" placeholder="${currentBoardName}" required maxlength="12">`;
-        dom.removeBoardNamesEventListener();
+    renameHandler: function (event) {
+        const currentName = event.target.innerText;
+        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
+        dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
         const boardId = event.target.parentElement.parentElement.id;
@@ -146,11 +153,11 @@ export let dom = {
                             dataHandler.renameBoard(boardId, inputField.value)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
-                                    dom.addBoardNamesEventListener();
+                                    dom.addNamesEventListener();
                                 })
                         } else {
-                            (event.target.parentElement.innerHTML = currentBoardName);
-                            dom.addBoardNamesEventListener();
+                            (event.target.parentElement.innerHTML = currentName);
+                            dom.addNamesEventListener();
                         }
                     } catch (e) {
                         if (e instanceof TypeError) {

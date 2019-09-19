@@ -34,10 +34,11 @@ export let dom = {
 
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
-            let currentBoard = this._appendToElement(elementToExtend, newBoard , false);
+            this._appendToElement(elementToExtend, newBoard , false);
             for (let statuses of board.statuses) {
                 let newStatus = this.checkStatuses(statuses);
-                this._appendToElement(currentBoard, newStatus, false);
+                let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
+                this._appendToElement(statusContainer, newStatus, false);
                 for (let card of statuses.cards){
                     let newCard = this.checkCards(card);
                     let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
@@ -63,8 +64,9 @@ export let dom = {
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
                 <button class="add-card">Add Card</button>
-                <button class="open-board">Open Board</button>
-            </div>    
+                <div class="open-board fas fa-angle-down"></div>
+            </div>
+            <div class="board-body"></div>   
         </div>
         
       `
@@ -84,7 +86,11 @@ export let dom = {
 
 
     cardTemplate: function (card) {
-        return `<div id="${card.id}">${card.title}</div>`;
+        return `
+            <div class="card" id="${card.id}">
+                <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                <div class="card-title">${card.title}</div>
+            </div>`
     },
 
 

@@ -10,18 +10,18 @@ DROP SEQUENCE IF EXISTS public.card_id_seq;
 
 CREATE TABLE board (
     id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL
+    title VARCHAR(200) NOT NULL DEFAULT 'New Board'
 );
 
 CREATE TABLE status (
     id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
+    title VARCHAR(200) NOT NULL DEFAULT 'New Status',
     board_id INTEGER NOT NULL
 );
 
 CREATE TABLE card (
     id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
+    title VARCHAR(200) NOT NULL DEFAULT 'New Card',
     status_id INTEGER NOT NULL
 );
 
@@ -57,4 +57,4 @@ INSERT INTO card (id, title, status_id) VALUES (3, 'Card 3', 1);
 INSERT INTO card (id, title, status_id) VALUES (4, 'Card 4', 2);
 INSERT INTO card (id, title, status_id) VALUES (5, 'Card 5', 9);
 INSERT INTO card (id, title, status_id) VALUES (6, 'Card 6', 11);
-SELECT pg_catalog.setval('card_id_seq', 1, true);
+SELECT pg_catalog.setval('card_id_seq', 6, true);

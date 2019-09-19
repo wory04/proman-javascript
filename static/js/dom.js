@@ -80,7 +80,7 @@ export let dom = {
     },
 
     openBoardHandler: function (event) {
-        let clickedBoard = event.currentTarget().parentElement.parentElement;
+        let clickedBoard = event.target.parentElement.nextElementSibling;
         clickedBoard.classList.toggle('hide');
     },
 

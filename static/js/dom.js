@@ -51,13 +51,20 @@ export let dom = {
                 }
             }
         }
+
         let openButtons = document.querySelectorAll('.open-board');
         for (let openButton of openButtons) {
             openButton.addEventListener('click', this.openBoardHandler);
         }
 
-        let addCardButtons = document.querySelectorAll('.add-card');
+        let addStatusButtons = document.querySelectorAll('.add-status');
+        for (let addStatusButton of addStatusButtons) {
+            addStatusButton.addEventListener('click', function (event) {
+                dom.newStatusHandler(event);
+            })
+        }
 
+        let addCardButtons = document.querySelectorAll('.add-card');
         for (let addCardButton of addCardButtons) {
             addCardButton.addEventListener('click', function (event) {
                 dom.newCardHandler(event);
@@ -77,6 +84,8 @@ export let dom = {
         dataHandler.createNewBoard(dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
             .then((currentBoard) => currentBoard.querySelector('.add-card').addEventListener('click', this.newCardHandler))
+            .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], this.statusTemplate))
+            .then((newStatus) => this._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
     },
 
     openBoardHandler: function (event) {
@@ -89,6 +98,15 @@ export let dom = {
             event.target.classList.remove('fa-chevron-down');
             event.target.classList.add('fa-chevron-up');
         }
+    },
+
+    newStatusHandler: function (event) {
+        const boardId = event.target.parentElement.parentElement.id;
+        const statusContainer = event.target.parentElement.nextElementSibling;
+
+        dataHandler.createNewStatus(boardId, this.statusTemplate)
+            .then((newStatus) => this._appendToElement(statusContainer, newStatus, false)
+        );
     },
 
     newCardHandler: function (event) {

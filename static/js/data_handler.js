@@ -59,6 +59,7 @@ export let dataHandler = {
         let postData = {};
         return this._api_post('/board', postData, callback)
     },
+
     createNewCard: function (statusId, callback) {
         const newCardStatus = {'statusId': `${statusId}`};
         const newCardUrl = '/card';

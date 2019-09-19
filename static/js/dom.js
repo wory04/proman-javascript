@@ -105,6 +105,7 @@ export let dom = {
         <div id=${board.id} class="board">
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
+                <button class="add-status">Add Status</button>
                 <button class="add-card">Add Card</button>
                 <div class="open-board fas fa-chevron-up"></div>
             </div>

@@ -27,6 +27,18 @@ export let dom = {
             dom.showBoards(boards);
         });
     },
+    addBoardNamesEventListener: function () {
+        let boardNames = document.querySelectorAll('.board-title');
+        for (let boardName of boardNames) {
+            boardName.addEventListener('click', this.renameBoardHandler);
+        }
+    },
+    removeBoardNamesEventListener: function () {
+        let boardNames = document.querySelectorAll('.board-title');
+        for (let boardName of boardNames) {
+            boardName.removeEventListener('click', dom.renameBoardHandler);
+        }
+    },
     showBoards: function (boards) {
         // shows boards appending them to #boards div
         // it adds necessary event listeners also
@@ -67,10 +79,7 @@ export let dom = {
             addCardButton.addEventListener('click', this.newCardHandler)
         }
 
-        let boardNames = document.querySelectorAll('.board-title');
-        for (let boardName of boardNames) {
-            boardName.addEventListener('click', this.renameBoardHandler)
-        }
+        this.addBoardNamesEventListener();
     },
     loadCards: function (boardId) {
         // retrieves cards and makes showCards called
@@ -126,10 +135,7 @@ export let dom = {
     renameBoardHandler: function (event) {
         const currentBoardName = event.target.innerText;
         event.target.innerHTML = `<input type="text" placeholder="${currentBoardName}" required maxlength="12">`;
-        let boardNames = document.querySelectorAll('.board-title');
-        for (let boardName of boardNames) {
-            boardName.removeEventListener('click', dom.renameBoardHandler)
-        }
+        dom.removeBoardNamesEventListener();
 
         const inputField = document.querySelector('input');
         const boardId = event.target.parentElement.parentElement.id;
@@ -140,17 +146,11 @@ export let dom = {
                             dataHandler.renameBoard(boardId, inputField.value)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
-                                    let boardNames = document.querySelectorAll('.board-title');
-                                    for (let boardName of boardNames) {
-                                        boardName.addEventListener('click', dom.renameBoardHandler)
-                                    }
+                                    dom.addBoardNamesEventListener();
                                 })
                         } else {
                             (event.target.parentElement.innerHTML = currentBoardName);
-                            let boardNames = document.querySelectorAll('.board-title');
-                            for (let boardName of boardNames) {
-                                boardName.addEventListener('click', dom.renameBoardHandler)
-                            }
+                            dom.addBoardNamesEventListener();
                         }
                     } catch (e) {
                         if (e instanceof TypeError) {

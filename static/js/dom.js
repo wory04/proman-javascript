@@ -14,12 +14,11 @@ export let dom = {
                 elementToExtend.appendChild(childNode);
             }
         }
-
         return elementToExtend.lastChild;
     },
     init: function () {
         // This function should run once, when the page is loaded.
-        let addButton = document.querySelector('.add-board');
+        let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
     },
     loadBoards: function () {
@@ -36,17 +35,18 @@ export let dom = {
 
         for (let board of boards) {
             let newBoard = this.boardTemplate(board);
-            let currentBoard = this._appendToElement(elementToExtend, newBoard, false);
+            this._appendToElement(elementToExtend, newBoard , false);
             for (let statuses of board.statuses) {
                 if (statuses.length !== 0) {
                     let newStatus = this.statusTemplate(statuses);
-                    this._appendToElement(currentBoard, newStatus, false);
-                }
-                for (let card of statuses.cards) {
-                    if (card.length !== 0) {
-                        let newCard = this.cardTemplate(card);
-                        let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
-                        this._appendToElement(cardContainer, newCard, false);
+                    let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
+                    this._appendToElement(statusContainer, newStatus, false);
+                    for (let card of statuses.cards) {
+                        if (card.length !== 0) {
+                            let newCard = this.cardTemplate(card);
+                            let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                            this._appendToElement(cardContainer, newCard, false);
+                        }
                     }
                 }
             }
@@ -56,6 +56,13 @@ export let dom = {
             openButton.addEventListener('click', this.openBoardHandler);
         }
 
+        let addCardButtons = document.querySelectorAll('.add-card');
+
+        for (let addCardButton of addCardButtons) {
+            addCardButton.addEventListener('click', function (event) {
+                dom.newCardHandler(event);
+            })
+        }
     },
     loadCards: function (boardId) {
         // retrieves cards and makes showCards called
@@ -70,12 +77,20 @@ export let dom = {
         dataHandler.createNewBoard(dom.boardTemplate).then(
             (newBoard) => dom._appendToElement(boards, newBoard, false)
         )
-
     },
 
     openBoardHandler: function (event) {
         let clickedBoard = event.currentTarget().parentElement.parentElement;
         clickedBoard.classList.toggle('hide');
+    },
+
+    newCardHandler: function (event) {
+        const statusId = event.target.parentElement.nextElementSibling.firstElementChild.id;
+        const currentStatus = event.target.parentElement.nextElementSibling.firstElementChild;
+
+        dataHandler.createNewCard(statusId, this.cardTemplate).then(
+            (newCard) => this._appendToElement(currentStatus, newCard, false)
+        );
     },
 
     boardTemplate: function (board) {
@@ -84,10 +99,10 @@ export let dom = {
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
                 <button class="add-card">Add Card</button>
-                <button class="open-board">Open Board</button>
-            </div>    
+                <div class="open-board fas fa-angle-down"></div>
+            </div>
+            <div class="board-body"></div>   
         </div>
-        
       `
     },
 
@@ -98,25 +113,16 @@ export let dom = {
                             <span class="status-title">${status.title}</span>
                         </div>
                         <div class="cards"></div>   
-                    </div>                 
-    
+                    </div>
                     `
     },
 
 
     cardTemplate: function (card) {
-        return `<div id="${card.id}">${card.title}</div>`;
+        return `
+            <div class="card" id="${card.id}">
+                <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                <div class="card-title">${card.title}</div>
+            </div>`
     },
-
-
-    checkStatuses: function (statuses) {
-        return `${statuses ? this.statusTemplate(statuses) : ''}`
-    },
-
-
-    checkCards: function (card) {
-        return `${card ? this.cardTemplate(card) : ''}`
-    },
-
-
 };

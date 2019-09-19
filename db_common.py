@@ -5,7 +5,7 @@ from psycopg2 import sql
 @db_connection.connection_handler
 def get_all_from_table(cursor, table):
     query_for_func = sql.SQL('SELECT * FROM {}').format(
-        sql.Identifier(table))
+                     sql.Identifier(table))
     cursor.execute(query_for_func)
 
     all_from_table = cursor.fetchall()
@@ -24,6 +24,21 @@ def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
     )
     cursor.execute(query_for_all_from_inner_by_outer_table)
     result = cursor.fetchall()
+
+    return result
+
+
+@db_connection.connection_handler
+def insert_into_inner_table(cursor, table, id_type, id_value):
+    query_to_insert_into_inner_table = sql.SQL('''
+    INSERT INTO {} ({}) VALUES ({}) RETURNING *
+    ''').format(
+        sql.Identifier(table),
+        sql.Identifier(id_type),
+        sql.SQL(id_value)
+        )
+    cursor.execute(query_to_insert_into_inner_table)
+    result = cursor.fetchone()
 
     return result
 

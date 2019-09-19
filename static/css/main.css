@@ -1,3 +1,158 @@
-#boards {
-    background-color: green;
+:root{
+    --border-radius: 3px;
+    --status-1: #2F35D9;
+    --status-2: #0067FF;
+    --status-3: #0086FF;
+    --status-4: #009DEE;
+    --status-5: #00B0C3;
+    --status-6: #00C4BE;
+    --status-7: #45D6AF;
+    --status-8: #7FE599;
+}
+
+body{
+    min-width: 620px;
+    background: url('/static/images/aerial-alpine-ceresole-reale-1562.jpg') no-repeat;
+    background-size: cover;
+    font-family: sans-serif;
+}
+
+h1, .board-title, .status-title{
+    font-weight: 100;
+}
+
+h1{
+    text-align: center;
+    font-size: 4em;
+    letter-spacing: 5px;
+    transform: scale(1.2, 1);
+}
+
+button{
+    background: #994F97;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: sans-serif;
+    padding: 4px 10px;
+}
+
+.board-container{
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.board{
+    margin: 20px;
+    border: aliceblue;
+    background: #ffffff90;
+    border-radius: 3px;
+}
+
+.board-header{
+    height: 50px;
+    background: #fff;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.board-title{
+    margin: 13px;
+    display: inline-block;
+    font-size: 20px;
+}
+.board-title, .board-add, .open-board{
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.open-board{
+    float: right;
+    margin: 13px;
+}
+
+.board-body{
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: rgb(255, 233, 209, 0.6);
+}
+
+.board-body.hide{
+    display: none;
+}
+
+.status{
+    padding: 10px;
+    flex: 1;
+}
+
+.cards{
+    min-height: 49px;
+}
+
+.cards:empty{
+    /*This only works if the tag is really empty and there is not even whitespace inside*/
+    border: 4px solid #cdcdcd;
+    margin-top: 4px;
+    border-radius: 10px;
+    background: #eee;
+}
+
+.status-title{
+    text-align: center;
+}
+
+.card{
+    position: relative;
+    background: #222;
+    color: #fff;
+    border-radius: var(--border-radius);
+    margin: 4px 0;
+    padding: 4px;
+}
+
+.status:nth-of-type(1) .card{
+    background: var(--status-1);
+}
+
+.status:nth-of-type(2) .card{
+    background: var(--status-2);
+}
+
+.status:nth-of-type(3) .card{
+    background: var(--status-3);
+}
+
+.status:nth-of-type(4) .card{
+    background: var(--status-4);
+}
+
+.status:nth-of-type(5) .card{
+    background: var(--status-5);
+}
+
+.status:nth-of-type(6) .card{
+    background: var(--status-6);
+}
+
+.status:nth-of-type(7) .card{
+    background: var(--status-7);
+}
+
+.status:nth-of-type(8) .card{
+    background: var(--status-8);
+}
+
+.card-remove{
+    display: block;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.card-title{
+    padding-right: 16px;
 }

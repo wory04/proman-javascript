@@ -51,16 +51,20 @@ export let dom = {
                 }
             }
         }
+
         let openButtons = document.querySelectorAll('.open-board');
         for (let openButton of openButtons) {
             openButton.addEventListener('click', this.openBoardHandler);
         }
 
+        let addStatusButtons = document.querySelectorAll('.add-status');
+        for (let addStatusButton of addStatusButtons) {
+            addStatusButton.addEventListener('click', this.newStatusHandler)
+        }
+
         let addCardButtons = document.querySelectorAll('.add-card');
         for (let addCardButton of addCardButtons) {
-            addCardButton.addEventListener('click', function (event) {
-                dom.newCardHandler(event);
-            })
+            addCardButton.addEventListener('click', this.newCardHandler)
         }
 
         let boardNames = document.querySelectorAll('.board-title');
@@ -75,12 +79,19 @@ export let dom = {
         // shows the cards of a board
         // it adds necessary event listeners also
     },
+    addEventListenersToBoard: function (currentBoard) {
+        currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);
+        currentBoard.querySelector('.add-status').addEventListener('click', dom.newStatusHandler);
+        currentBoard.querySelector('.open-board').addEventListener('click', dom.openBoardHandler);
+    },
     // here comes more features
     newBoardHandler: function () {
         let boards = document.querySelector('#boards');
         dataHandler.createNewBoard(dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
-            .then((currentBoard) => currentBoard.querySelector('.add-card').addEventListener('click', this.newCardHandler))
+            .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
+            .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
+            .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
     },
 
     openBoardHandler: function (event) {
@@ -95,13 +106,22 @@ export let dom = {
         }
     },
 
+    newStatusHandler: function (event) {
+        const boardId = event.target.parentElement.parentElement.id;
+        const statusContainer = event.target.parentElement.nextElementSibling;
+
+        dataHandler.createNewStatus(boardId, dom.statusTemplate)
+            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false)
+        );
+    },
+
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
-        dataHandler.createNewCard(statusId, this.cardTemplate)
-            .then((newCard) => this._appendToElement(statusContainer, newCard, false)
-            );
+        dataHandler.createNewCard(statusId, dom.cardTemplate)
+            .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
+        );
     },
     renameBoardHandler: function (event) {
         const currentBoardName = event.target.innerText;
@@ -110,7 +130,7 @@ export let dom = {
         for (let boardName of boardNames) {
             boardName.removeEventListener('click', dom.renameBoardHandler)
         }
-        // ide kell még a status rename event listener remove
+
         const inputField = document.querySelector('input');
         const boardId = event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
@@ -132,8 +152,7 @@ export let dom = {
                                 boardName.addEventListener('click', dom.renameBoardHandler)
                             }
                         }
-                    } catch
-                        (e) {
+                    } catch (e) {
                         if (e instanceof TypeError) {
                         }
                     }
@@ -147,6 +166,7 @@ export let dom = {
         <div id=${board.id} class="board">
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
+                <button class="add-status">Add Status</button>
                 <button class="add-card">Add Card</button>
                 <div class="open-board fas fa-chevron-up"></div>
             </div>

@@ -19,3 +19,15 @@ def create_new_card(card_status):
 
 def create_new_board():
     return db_common.create_new_board()
+
+
+def rename_board(board_data):
+    board_title = board_data['title']
+    board_id = board_data['id']
+    return db_common.update_title_by_id(board_id, board_title, 'board')
+
+
+def rename_status(status_data):
+    status_id = status_data['id']
+    status_title = status_data['title']
+    return db_common.update_title_by_id(status_id, status_title, 'status')

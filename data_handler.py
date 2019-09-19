@@ -17,6 +17,13 @@ def create_new_card(card_status):
     return db_common.insert_into_inner_table(card_table, card_status_column, card_status)
 
 
+def create_new_status(status_board):
+    status_table = 'status'
+    status_board_column = 'board_id'
+
+    return db_common.insert_into_inner_table(status_table, status_board_column, status_board)
+
+
 def create_new_board():
     return db_common.create_new_board()
 

@@ -12,7 +12,7 @@
 
 body{
     min-width: 620px;
-    background: url('/static/images/aerial-alpine-ceresole-reale-1562.jpg') no-repeat;
+    background: url('/static/images/aerial-alpine-ceresole-reale-1562.jpg') fixed;
     background-size: cover;
     font-family: sans-serif;
 }
@@ -62,7 +62,12 @@ button{
     display: inline-block;
     font-size: 20px;
 }
-.board-title, .board-add, .open-board{
+
+.board-title:hover, .status-title:hover{
+    cursor: pointer;
+}
+
+.board-title, .board-add, .add-status, .open-board{
     display: inline-block;
     margin-left: 20px;
 }

@@ -59,16 +59,12 @@ export let dom = {
 
         let addStatusButtons = document.querySelectorAll('.add-status');
         for (let addStatusButton of addStatusButtons) {
-            addStatusButton.addEventListener('click', function (event) {
-                dom.newStatusHandler(event);
-            })
+            addStatusButton.addEventListener('click', this.newStatusHandler)
         }
 
         let addCardButtons = document.querySelectorAll('.add-card');
         for (let addCardButton of addCardButtons) {
-            addCardButton.addEventListener('click', function (event) {
-                dom.newCardHandler(event);
-            })
+            addCardButton.addEventListener('click', this.newCardHandler)
         }
     },
     loadCards: function (boardId) {
@@ -78,14 +74,19 @@ export let dom = {
         // shows the cards of a board
         // it adds necessary event listeners also
     },
+    addEventListenersToBoard: function (currentBoard) {
+        currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);
+        currentBoard.querySelector('.add-status').addEventListener('click', dom.newStatusHandler);
+        currentBoard.querySelector('.open-board').addEventListener('click', dom.openBoardHandler);
+    },
     // here comes more features
     newBoardHandler: function () {
         let boards = document.querySelector('#boards');
         dataHandler.createNewBoard(dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
-            .then((currentBoard) => currentBoard.querySelector('.add-card').addEventListener('click', this.newCardHandler))
-            .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], this.statusTemplate))
-            .then((newStatus) => this._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
+            .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
+            .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
+            .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
     },
 
     openBoardHandler: function (event) {
@@ -104,8 +105,8 @@ export let dom = {
         const boardId = event.target.parentElement.parentElement.id;
         const statusContainer = event.target.parentElement.nextElementSibling;
 
-        dataHandler.createNewStatus(boardId, this.statusTemplate)
-            .then((newStatus) => this._appendToElement(statusContainer, newStatus, false)
+        dataHandler.createNewStatus(boardId, dom.statusTemplate)
+            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false)
         );
     },
 
@@ -113,8 +114,8 @@ export let dom = {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
-        dataHandler.createNewCard(statusId, this.cardTemplate)
-            .then((newCard) => this._appendToElement(statusContainer, newCard, false)
+        dataHandler.createNewCard(statusId, dom.cardTemplate)
+            .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
         );
     },
 

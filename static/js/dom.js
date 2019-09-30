@@ -149,12 +149,13 @@ export let dom = {
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const parentId = event.target.parentElement.parentElement.id;
+        const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-                if (event.code === 'Enter') {
+            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, inputField.value, event.target.parentElement.parentElement.parentElement.className)
+                            dataHandler.renameTitle(parentId, inputField.value, containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();

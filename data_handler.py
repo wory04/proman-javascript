@@ -56,3 +56,20 @@ def hash_password(plain_text_password):
 def verify_password(plain_text_password, hashed_password):
     hashed_bytes_password = hashed_password.encode('utf-8')
     return bcrypt.checkpw(plain_text_password.encode('utf-8'), hashed_bytes_password)
+
+
+def new_registration(user_data):
+    user_names = [row['name'] for row in db_common.get_all_users()]
+
+    if user_data['username'] not in user_names:
+        hashed_password = hash_password(user_data['password'])
+        new_user = db_common.save_new_registration([user_data['username'], hashed_password])
+        return new_user
+
+
+def validate_login(user_data):
+    is_valid_username = user_data['username'] in [row['name'] for row in db_common.get_all_users()]
+    if is_valid_username:
+        password = db_common.get_password_by_username(user_data['username'])['password']
+        return verify_password(user_data['password'], password)
+    return False

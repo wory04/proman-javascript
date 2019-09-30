@@ -1,5 +1,8 @@
 ALTER TABLE IF EXISTS ONLY public.status DROP CONSTRAINT IF EXISTS fk_status_board_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.card DROP CONSTRAINT IF EXISTS fk_card_status_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.board DROP CONSTRAINT IF EXISTS fk_board_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.status DROP CONSTRAINT IF EXISTS fk_status_user_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.card DROP CONSTRAINT IF EXISTS fk_card_info_user_id CASCADE;
 
 DROP TABLE IF EXISTS public.board;
 DROP SEQUENCE IF EXISTS public.board_id_seq;
@@ -7,28 +10,45 @@ DROP TABLE IF EXISTS public.status;
 DROP SEQUENCE IF EXISTS public.status_id_seq;
 DROP TABLE IF EXISTS public.card;
 DROP SEQUENCE IF EXISTS public.card_id_seq;
+DROP TABLE IF EXISTS public.user_info;
+DROP SEQUENCE IF EXISTS public.user_info_id_seq;
 
 CREATE TABLE board (
-    id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL DEFAULT 'New Board'
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL DEFAULT 'New Board',
+    user_id INTEGER
 );
 
 CREATE TABLE status (
-    id SERIAL NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL DEFAULT 'New Status',
-    board_id INTEGER NOT NULL
+    board_id INTEGER NOT NULL,
+    user_id INTEGER
 );
 
 CREATE TABLE card (
-    id SERIAL NOT NULL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL DEFAULT 'New Card',
-    status_id INTEGER NOT NULL
+    status_id INTEGER NOT NULL,
+    user_id INTEGER
+);
+
+CREATE TABLE user_info (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    password VARCHAR(200) NOT NULL
 );
 
 ALTER TABLE ONLY status
     ADD CONSTRAINT fk_status_board_id FOREIGN KEY (board_id) REFERENCES board(id);
 ALTER TABLE ONLY card
     ADD CONSTRAINT fk_card_status_id FOREIGN KEY (status_id) REFERENCES  status(id);
+ALTER TABLE ONLY board
+    ADD CONSTRAINT fk_board_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
+ALTER TABLE ONLY status
+    ADD CONSTRAINT fk_status_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
+ALTER TABLE ONLY card
+    ADD CONSTRAINT fk_card_info_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
 
 
 INSERT INTO board (id, title) VALUES (1, 'Feature 1');
@@ -64,3 +84,7 @@ INSERT INTO card (id, title, status_id) VALUES (8, 'Task 8', 12);
 INSERT INTO card (id, title, status_id) VALUES (9, 'Task 9', 13);
 INSERT INTO card (id, title, status_id) VALUES (10, 'Task 10', 14);
 SELECT pg_catalog.setval('card_id_seq', 10, true);
+
+
+INSERT INTO user_info (id, name, password) VALUES (1, 'admin', 'admin');
+SELECT pg_catalog.setval('user_info_id_seq', 1, true);

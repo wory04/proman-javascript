@@ -4,7 +4,7 @@ from psycopg2 import sql
 
 @db_connection.connection_handler
 def get_all_from_table(cursor, table):
-    query_for_func = sql.SQL('SELECT * FROM {}').format(
+    query_for_func = sql.SQL('SELECT * FROM {} ORDER BY id ASC').format(
         sql.Identifier(table))
     cursor.execute(query_for_func)
 
@@ -16,7 +16,7 @@ def get_all_from_table(cursor, table):
 @db_connection.connection_handler
 def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
     query_for_all_from_inner_by_outer_table = sql.SQL('''
-        SELECT * FROM {} WHERE {} = {};
+        SELECT * FROM {} WHERE {} = {} ORDER BY id ASC;
         ''').format(
         sql.Identifier(table),
         sql.Identifier(id_type),

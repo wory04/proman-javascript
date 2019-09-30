@@ -116,6 +116,11 @@ export let dom = {
         currentBoard.querySelector('.board-title').addEventListener('click', dom.renameHandler);
     },
 
+    addEventListenersToCard: function(currentCard) {
+        currentCard.querySelector('.fas.fa-trash-alt').addEventListener('click', dom.deleteHandler);
+        currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler);
+    },
+
     newBoardHandler: function () {
         let boards = document.querySelector('#boards');
         dataHandler.createNewBoard(dom.boardTemplate)
@@ -148,7 +153,7 @@ export let dom = {
 
         dataHandler.createNewCard(statusId, dom.cardTemplate)
             .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
-            .then(currentCard => currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler));
+            .then(currentCard => dom.addEventListenersToCard(currentCard));
     },
     renameHandler: function (event) {
         const currentName = event.target.innerText;

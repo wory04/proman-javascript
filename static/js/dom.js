@@ -140,8 +140,8 @@ export let dom = {
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
         dataHandler.createNewCard(statusId, dom.cardTemplate)
-            .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
-            );
+            .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
+            .then(currentCard => currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler));
     },
     renameHandler: function (event) {
         const currentName = event.target.innerText;

@@ -160,4 +160,5 @@ button{
 
 .card-title{
     padding-right: 16px;
+    cursor: pointer;
 }

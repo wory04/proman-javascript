@@ -105,7 +105,7 @@ export let dom = {
         dataHandler.createNewBoard(dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
             .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
-            .then( () => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
+            .then(() => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
             .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
             .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler))
     },
@@ -115,7 +115,6 @@ export let dom = {
         clickedBoard.classList.toggle('hide');
         event.target.classList.toggle('fa-chevron-up');
         event.target.classList.toggle('fa-chevron-down');
-
     },
 
     newStatusHandler: function (event) {
@@ -133,7 +132,7 @@ export let dom = {
 
         dataHandler.createNewCard(statusId, dom.cardTemplate)
             .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
-        );
+            );
     },
     renameHandler: function (event) {
         const currentName = event.target.innerText;

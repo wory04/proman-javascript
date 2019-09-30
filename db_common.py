@@ -67,3 +67,15 @@ def update_title_by_id(cursor, id_number, title, table):
 
     result = cursor.fetchone()
     return result
+
+
+@db_connection.connection_handler
+def delete_card_by_id(cursor, card_id):
+    cursor.execute(sql.SQL('''
+                    DELETE FROM card
+                    WHERE id = %(card_id)s
+                    RETURNING *
+                    '''), {'card_id': card_id})
+
+    result = cursor.fetchone()
+    return result

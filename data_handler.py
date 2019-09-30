@@ -44,3 +44,8 @@ def rename_card(card_data):
     card_id = card_data['id']
     card_title = card_data['title']
     return db_common.update_title_by_id(card_id, card_title, 'card')
+
+
+def delete_card(card_data):
+    card_id = card_data['id']
+    return db_common.delete_card_by_id(card_id)

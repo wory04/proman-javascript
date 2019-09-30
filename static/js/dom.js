@@ -186,7 +186,8 @@ export let dom = {
         )
     },
     deleteHandler: function(event) {
-        console.log('Works')
+        const cardId = event.target.parentElement.parentElement.id;
+        dataHandler.deleteCard(cardId)
     },
 
     boardTemplate: function (board) {

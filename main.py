@@ -60,11 +60,15 @@ def rename_status(id):
     return data_handler.rename_status(status_data)
 
 
-@app.route('/card/<id>', methods=['PATCH'])
+@app.route('/card/<id>', methods=['PATCH', 'DELETE'])
 @json_response
 def rename_card(id):
-    card_data = request.get_json()
-    return data_handler.rename_card(card_data)
+    if request.method == 'PATCH':
+        card_data = request.get_json()
+        return data_handler.rename_card(card_data)
+    elif request.method == 'DELETE':
+        card_data = request.get_json()
+        return data_handler.delete_card(card_data)
 
 
 def main():

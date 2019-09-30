@@ -38,6 +38,10 @@ export let dom = {
             statusName.addEventListener('click', dom.renameHandler);
         }
 
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.addEventListener('click', dom.renameHandler);
+        }
     },
     removeNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');

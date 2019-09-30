@@ -20,6 +20,7 @@ export let dom = {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
+        this.dragStart()
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -192,9 +193,83 @@ export let dom = {
 
     cardTemplate: function (card) {
         return `
-            <div class="card" id="${card.id}">
+            <div class="card" id="${card.id}" draggable="true">
                 <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                 <div class="card-title">${card.title}</div>
             </div>`
     },
+
+
+    dragStart: function (){
+
+        document.addEventListener('drag', function(event) {
+
+        }, false);
+        document.addEventListener('dragstart', dom.dragStartHandler, false);
+        document.addEventListener('dragend', dom.dragEndHandler, false);
+        document.addEventListener('dragover', dom.dragOverHandler, false);
+
+        document.addEventListener('dragenter', dom.dragEnterHandler, false);
+        document.addEventListener('dragleave', dom.dragLeaveHandler, false);
+        document.addEventListener('drop', dom.dropHandler, false);
+
+    },
+
+    dragStartHandler: function (event){
+        event.target.dataset.dragged = "true";
+        let boardBody = event.target.parentElement.parentElement.parentElement;
+        let dropzones = boardBody.querySelectorAll('.status > .cards');
+        for (let dropzone of dropzones){
+            dropzone.classList.add('dropzone')
+        }
+    },
+
+    dragEndHandler: function (event){
+        event.target.dataset.dragged = "false";
+    },
+
+    dragOverHandler: function (event){
+        event.preventDefault();
+    },
+
+     dragEnterHandler: function (event){
+        if (event.target.classList.contains("dropzone") ) {
+            event.target.style.background = "grey";
+
+      }
+    },
+
+     dragLeaveHandler: function (event){
+         if (event.target.classList.contains("dropzone")) {
+            event.target.style.background = "";
+      }
+    },
+
+    dropHandler: function (event){
+        let dragged = document.querySelector("[data-dragged='true']");
+        event.preventDefault();
+        if (event.target.classList.contains('dropzone') ) {
+            event.target.style.background = "";
+            dragged.parentNode.removeChild(dragged);
+            event.target.appendChild(dragged);
+            let statusId = event.target.parentElement.id;
+            let cardId = dragged.id;
+            dataHandler.updateCard(statusId, cardId);
+        }
+        if (dragged) {
+            dragged.dataset.dragged = 'false';
+            dragged = null;
+            dom.removeDropzones();
+
+        }
+
+    },
+    removeDropzones: function () {
+        let dropzones = document.querySelectorAll('.dropzone');
+        for (let dropzone of dropzones){
+            dropzone.classList.remove('dropzone');
+        }
+
+    }
+
 };

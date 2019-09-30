@@ -53,6 +53,11 @@ export let dom = {
         for (let statusName of statusNames) {
             statusName.removeEventListener('click', dom.renameHandler);
         }
+
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.removeEventListener('click', dom.renameHandler);
+        }
     },
     showBoards: function (boards) {
         // shows boards appending them to #boards div

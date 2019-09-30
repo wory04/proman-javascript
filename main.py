@@ -1,9 +1,10 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, session, jsonify, make_response
 from util import json_response
 
 import data_handler
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route("/")
@@ -11,7 +12,8 @@ def index():
     """
     This is a one-pager which shows all the boards and cards
     """
-    return render_template('index.html')
+    username = session.get('username')
+    return render_template('index.html', username=username)
 
 
 @app.route("/get-boards")
@@ -65,6 +67,38 @@ def rename_status(id):
 def rename_card(id):
     card_data = request.get_json()
     return data_handler.rename_card(card_data)
+
+
+@app.route('/registration', methods=['POST'])
+def route_registration():
+    user_data = request.get_json()
+    new_user = data_handler.new_registration(user_data)
+
+    if new_user:
+        response = {'id': new_user['id'], 'name': new_user['name'], 'message': "Successful registration!"}
+        return make_response(jsonify(response), 201)
+    else:
+        return make_response(jsonify({"message": "This username is already taken! Please choose another one!"}), 406)
+
+
+@app.route('/login', methods=['POST'])
+def route_login():
+    user_data = request.get_json()
+
+    if data_handler.validate_login(user_data):
+        session['username'] = user_data['username']
+        response = {"message": "You are logged in!"}
+        return make_response(jsonify(response), 200)
+
+    response = {"message": "Login failed! Invalid credentials!"}
+    return make_response(jsonify(response), 401)
+
+
+@app.route('/logout', methods=['POST'])
+def route_logout():
+    session.pop('username')
+    response = {"message": "You successfully logged out!"}
+    return make_response(jsonify(response), 200)
 
 
 def main():

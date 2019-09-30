@@ -59,9 +59,9 @@ def create_new_board(cursor):
 @db_connection.connection_handler
 def update_title_by_id(cursor, id_number, title, table):
     cursor.execute(sql.SQL('''
-                UPDATE {table}
-                SET title = %(title)s
-                WHERE id = %(id)s
+                   UPDATE {table}
+                      SET title = %(title)s
+                    WHERE id = %(id)s
                 RETURNING *;
             ''').format(table=sql.Identifier(table)), {'title': title, 'id': id_number})
 

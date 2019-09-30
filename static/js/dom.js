@@ -179,6 +179,9 @@ export let dom = {
             }
         )
     },
+    deleteHandler: function(event) {
+        console.log('Works')
+    },
 
     boardTemplate: function (board) {
         return `

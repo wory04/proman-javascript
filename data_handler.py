@@ -38,3 +38,9 @@ def rename_status(status_data):
     status_id = status_data['id']
     status_title = status_data['title']
     return db_common.update_title_by_id(status_id, status_title, 'status')
+
+
+def move_card(moved_card):
+    status_id = moved_card['statusId']
+    card_id = moved_card['cardId']
+    return db_common.update_card(status_id, card_id)

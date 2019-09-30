@@ -61,6 +61,7 @@ def rename_status(id):
 
 
 @app.route('/card/<id>', methods=['PATCH'])
+@json_response
 def rename_card(id):
     card_data = request.get_json()
     return data_handler.rename_card(card_data)

@@ -113,13 +113,9 @@ export let dom = {
     openBoardHandler: function (event) {
         let clickedBoard = event.target.parentElement.nextElementSibling;
         clickedBoard.classList.toggle('hide');
-        if (clickedBoard.classList.contains('hide')) {
-            event.target.classList.remove('fa-chevron-up');
-            event.target.classList.add('fa-chevron-down');
-        } else {
-            event.target.classList.remove('fa-chevron-down');
-            event.target.classList.add('fa-chevron-up');
-        }
+        event.target.classList.toggle('fa-chevron-up');
+        event.target.classList.toggle('fa-chevron-down');
+
     },
 
     newStatusHandler: function (event) {
@@ -161,6 +157,7 @@ export let dom = {
                         }
                     } catch (e) {
                         if (e instanceof TypeError) {
+                            console.log(e.message);
                         }
                     }
                 }

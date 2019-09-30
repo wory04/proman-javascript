@@ -106,7 +106,8 @@ export let dom = {
         }
 
         this.addNamesEventListener();
-    },
+        this.addDeleteEventListener();
+        },
 
     addEventListenersToBoard: function (currentBoard) {
         currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);

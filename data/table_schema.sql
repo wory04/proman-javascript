@@ -86,5 +86,5 @@ INSERT INTO card (id, title, status_id) VALUES (10, 'Task 10', 14);
 SELECT pg_catalog.setval('card_id_seq', 10, true);
 
 
-INSERT INTO user_info (id, name, password) VALUES (1, 'admin', 'admin');
+INSERT INTO user_info (id, name, password) VALUES (1, 'admin1', '$2b$12$RPCk9T6rpCEgkV8NiocthuHiNkFUp.4FJutWxoPXpbBDXUXeAJysW');
 SELECT pg_catalog.setval('user_info_id_seq', 1, true);

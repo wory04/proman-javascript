@@ -59,6 +59,12 @@ export let dom = {
             cardName.removeEventListener('click', dom.renameHandler);
         }
     },
+    addDeleteEventListener: function() {
+        let deleteButtons = document.querySelectorAll('.fas.fa-trash-alt');
+        for (let deleteButton of deleteButtons) {
+            deleteButton.addEventListener('click', dom.deleteHandler);
+        }
+    },
     showBoards: function (boards) {
         // shows boards appending them to #boards div
         // it adds necessary event listeners also

@@ -86,5 +86,12 @@ export let dataHandler = {
         const newNameData = {'id': parentId, 'title': newName};
         const url = `/${type}/${parentId}`;
         return this._api_patch(url, newNameData);
+    },
+
+    deleteCard: function (cardId) {
+        const cardData = {'id': cardId};
+        const url = `/card/${cardId}`
+
+        return this._api_delete(url, cardData)
     }
 };

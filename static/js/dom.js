@@ -16,6 +16,11 @@ export let dom = {
         }
         return elementToExtend.lastChild;
     },
+    _deleteCard: function(cardData) {
+        let cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
+        let cardContainer = document.querySelector(`.card[id="${cardData.id}"`).parentElement;
+        cardContainer.removeChild(cardToRemove);
+    },
     init: function () {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
@@ -188,6 +193,7 @@ export let dom = {
     deleteHandler: function(event) {
         const cardId = event.target.parentElement.parentElement.id;
         dataHandler.deleteCard(cardId)
+            .then(deletedCard => dom._deleteCard(deletedCard))
     },
 
     boardTemplate: function (board) {

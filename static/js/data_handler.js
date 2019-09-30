@@ -37,6 +37,16 @@ export let dataHandler = {
         })
             .then(response => response.json())
     },
+    _api_delete: function(url, data){
+        return fetch(url, {
+            method: 'DELETE',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+    },
     init: function () {
     },
     getBoards: function (callback) {
@@ -90,7 +100,7 @@ export let dataHandler = {
 
     deleteCard: function (cardId) {
         const cardData = {'id': cardId};
-        const url = `/card/${cardId}`
+        const url = `/card/${cardId}`;
 
         return this._api_delete(url, cardData)
     }

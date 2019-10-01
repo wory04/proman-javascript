@@ -162,7 +162,7 @@ export let dom = {
     },
     renameHandler: function (event) {
         const currentName = String(event.target.innerText);
-        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
+        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="20">`;
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');

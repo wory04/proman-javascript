@@ -161,7 +161,7 @@ export let dom = {
             .then(currentCard => dom.addEventListenersToCard(currentCard));
     },
     renameHandler: function (event) {
-        const currentName = event.target.innerText;
+        const currentName = String(event.target.innerText);
         event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
         dom.removeNamesEventListener();
 
@@ -172,7 +172,7 @@ export let dom = {
             if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, inputField.value, containerClassName)
+                            dataHandler.renameTitle(parentId, String(inputField.value), containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();

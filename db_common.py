@@ -79,3 +79,18 @@ def delete_card_by_id(cursor, card_id):
 
     result = cursor.fetchone()
     return result
+
+
+@db_connection.connection_handler
+def check_entity_is_full(cursor, column, counter, entity):
+    cursor.execute(sql.SQL('''
+                    SELECT  CASE
+                                WHEN COUNT({column}) < 8 THEN FALSE
+                                ELSE TRUE
+                            END AS count
+                    FROM {entity}
+                    WHERE {column} = %(counter)s;
+                    ''').format(column=sql.Identifier(column), entity=sql.Identifier(entity)), {'counter': counter})
+
+    result = cursor.fetchone()
+    return result

@@ -49,3 +49,9 @@ def rename_card(card_data):
 def delete_card(card_data):
     card_id = card_data['id']
     return db_common.delete_card_by_id(card_id)
+
+
+def is_full(column, data):
+    entity = data['entity']
+    counter = data['counter']
+    return db_common.check_entity_is_full(column, counter, entity)

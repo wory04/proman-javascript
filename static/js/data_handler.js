@@ -103,5 +103,12 @@ export let dataHandler = {
         const url = `/card/${cardId}`;
 
         return this._api_delete(url, cardData)
+    },
+    
+    isEntityFull: function (container, entity, counter, callback) {
+        const postData = {entity: entity, counter: counter};
+        const url = `/${container}/${counter}/${entity}`;
+
+        return this._api_post(url, postData, callback)
     }
 };

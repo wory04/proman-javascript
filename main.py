@@ -71,6 +71,13 @@ def rename_card(id):
         return data_handler.delete_card(card_data)
 
 
+@app.route('/board/<id>/status', methods=['POST'])
+@json_response
+def check_number_of_statuses_by_board_id(id):
+    data = request.get_json()
+    return data_handler.is_full('board_id', data)
+
+
 def main():
     app.run(debug=True)
 

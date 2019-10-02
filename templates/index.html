@@ -34,13 +34,13 @@
     </head>
     <body>
         <div class="nav-container" data-user="{{ username }}">
-            <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+            <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
                 {% if username %}
-                    <button id="logout" class="btn btn-info mr-auto">Logout</button>
+                    <button id="logout" class="nav-buttons">Logout</button>
                     <span class="navbar-text">You are logged in as {{ username }}</span>
                 {% else %}
-                    <button id="registration" class="btn btn-info">Registration</button>
-                    <button id="login" class="btn btn-info">Login</button>
+                    <button id="registration" class="nav-buttons">Registration</button>
+                    <button id="login" class="nav-buttons">Login</button>
                 {% endif %}
             </nav>
         </div>

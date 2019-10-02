@@ -39,6 +39,10 @@ export let dom = {
             statusName.addEventListener('click', dom.renameHandler);
         }
 
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.addEventListener('click', dom.renameHandler);
+        }
     },
     removeNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
@@ -49,6 +53,11 @@ export let dom = {
         let statusNames = document.querySelectorAll('.status-title');
         for (let statusName of statusNames) {
             statusName.removeEventListener('click', dom.renameHandler);
+        }
+
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.removeEventListener('click', dom.renameHandler);
         }
     },
     showBoards: function (boards) {
@@ -132,8 +141,8 @@ export let dom = {
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
         dataHandler.createNewCard(statusId, dom.cardTemplate)
-            .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
-            );
+            .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
+            .then(currentCard => currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler));
     },
     renameHandler: function (event) {
         const currentName = event.target.innerText;
@@ -141,12 +150,13 @@ export let dom = {
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const parentId = event.target.parentElement.parentElement.id;
+        const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-                if (event.code === 'Enter') {
+            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, inputField.value, event.target.parentElement.parentElement.parentElement.className)
+                            dataHandler.renameTitle(parentId, inputField.value, containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();

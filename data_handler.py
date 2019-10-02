@@ -55,3 +55,9 @@ def is_full(column, data):
     entity = data['entity']
     counter = data['counter']
     return db_common.check_entity_is_full(column, counter, entity)
+
+
+def move_card(moved_card):
+    status_id = moved_card['statusId']
+    card_id = moved_card['cardId']
+    return db_common.update_card(status_id, card_id)

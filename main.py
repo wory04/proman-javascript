@@ -67,6 +67,12 @@ def rename_card(id):
     return data_handler.rename_card(card_data)
 
 
+@app.route('/card/move', methods=['PATCH'])
+def card_move():
+    moved_card = request.get_json()
+    return data_handler.move_card(moved_card)
+
+
 def main():
     app.run(debug=True)
 

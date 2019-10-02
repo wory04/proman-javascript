@@ -20,7 +20,7 @@ export let dom = {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
-        this.dragStart()
+        this.initDrag()
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -200,7 +200,7 @@ export let dom = {
     },
 
 
-    dragStart: function (){
+    initDrag: function (){
 
         document.addEventListener('drag', function(event) {
 
@@ -248,13 +248,20 @@ export let dom = {
     dropHandler: function (event){
         let dragged = document.querySelector("[data-dragged='true']");
         event.preventDefault();
-        if (event.target.classList.contains('dropzone') ) {
-            event.target.style.background = "";
+        let currentElement = event.target;
+        while (!currentElement.classList.contains('dropzone')){
+            currentElement = currentElement.parentElement;
+        }
+        if (currentElement.classList.contains('dropzone') ) {
+            currentElement.style.background = "";
             dragged.parentNode.removeChild(dragged);
-            event.target.appendChild(dragged);
-            let statusId = event.target.parentElement.id;
+            let statusId = currentElement.parentElement.id;
             let cardId = dragged.id;
-            dataHandler.updateCard(statusId, cardId);
+
+            dataHandler.updateCard(statusId, cardId)
+                .then(response => dom.cardTemplate(response))
+                .then(card => dom._appendToElement(currentElement, card, false))
+                .then(appendCard => dom.getIndexOfCard(currentElement, appendCard))
         }
         if (dragged) {
             dragged.dataset.dragged = 'false';
@@ -270,6 +277,12 @@ export let dom = {
             dropzone.classList.remove('dropzone');
         }
 
-    }
+    },
+
+    getIndexOfCard: function (currentElement, dragged){
+        let movedCardPosition = Array.from(currentElement.children).indexOf(dragged);
+        console.log(movedCardPosition);
+    },
+
 
 };

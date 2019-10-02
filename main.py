@@ -27,8 +27,9 @@ def get_boards():
 @json_response
 def add_new_card():
     new_card_status = request.get_json()['statusId']
+    new_card_position = request.get_json()['position']
 
-    new_card = data_handler.create_new_card(new_card_status)
+    new_card = data_handler.create_new_card(new_card_status, new_card_position)
 
     return new_card
 

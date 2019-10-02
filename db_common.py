@@ -82,3 +82,18 @@ def update_card(cursor, status_id, card_id):
         ), {'status_id': status_id, 'card_id': card_id})
     result = cursor.fetchone()
     return result
+
+
+@db_connection.connection_handler
+def insert_into_card_table(cursor, status_id, card_position):
+    cursor.execute(
+        sql.SQL(
+            """
+            INSERT INTO card (status_id, position)
+            VALUES (%s, %s)
+            RETURNING *;
+            """
+        ), [status_id, card_position]
+    )
+    result = cursor.fetchone()
+    return result

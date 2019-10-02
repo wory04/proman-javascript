@@ -62,7 +62,7 @@ def rename_status(id):
 
 @app.route('/card/<id>', methods=['PATCH', 'DELETE'])
 @json_response
-def rename_card(id):
+def manipulate_card(id):
     if request.method == 'PATCH':
         card_data = request.get_json()
         return data_handler.rename_card(card_data)

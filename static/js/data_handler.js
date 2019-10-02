@@ -110,5 +110,11 @@ export let dataHandler = {
         const url = `/${container}/${counter}/${entity}`;
 
         return this._api_post(url, postData, callback)
+    },
+
+    updateCard: function (statusId, cardId) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
     }
 };

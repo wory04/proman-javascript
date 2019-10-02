@@ -94,3 +94,18 @@ def check_entity_is_full(cursor, column, counter, entity):
 
     result = cursor.fetchone()
     return result
+
+
+@db_connection.connection_handler
+def update_card(cursor, status_id, card_id):
+    cursor.execute(
+        sql.SQL(
+            """
+            UPDATE card
+            SET status_id = %(status_id)s
+            WHERE id = %(card_id)s
+            RETURNING *;
+            """
+        ), {'status_id': status_id, 'card_id': card_id})
+    result = cursor.fetchone()
+    return result

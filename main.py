@@ -85,6 +85,12 @@ def check_number_of_statuses_by_status_id(id):
     return data_handler.is_full('status_id', data)
 
 
+@app.route('/card/move', methods=['PATCH'])
+def card_move():
+    moved_card = request.get_json()
+    return data_handler.move_card(moved_card)
+
+
 def main():
     app.run(debug=True)
 

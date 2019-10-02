@@ -17,8 +17,8 @@ export let dom = {
         return elementToExtend.lastChild;
     },
     _deleteCard: function(cardData) {
-        let cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
-        let cardContainer = document.querySelector(`.card[id="${cardData.id}"`).parentElement;
+        const cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
+        let cardContainer = cardToRemove.parentElement;
         cardContainer.removeChild(cardToRemove);
     },
     init: function () {

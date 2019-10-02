@@ -62,11 +62,35 @@ def rename_status(id):
     return data_handler.rename_status(status_data)
 
 
-@app.route('/card/<id>', methods=['PATCH'])
+@app.route('/card/<id>', methods=['PATCH', 'DELETE'])
 @json_response
 def rename_card(id):
-    card_data = request.get_json()
-    return data_handler.rename_card(card_data)
+    if request.method == 'PATCH':
+        card_data = request.get_json()
+        return data_handler.rename_card(card_data)
+    elif request.method == 'DELETE':
+        card_data = request.get_json()
+        return data_handler.delete_card(card_data)
+
+
+@app.route('/board/<id>/status', methods=['POST'])
+@json_response
+def check_number_of_statuses_by_board_id(id):
+    data = request.get_json()
+    return data_handler.is_full('board_id', data)
+
+
+@app.route('/status/<id>/card', methods=['POST'])
+@json_response
+def check_number_of_statuses_by_status_id(id):
+    data = request.get_json()
+    return data_handler.is_full('status_id', data)
+
+
+@app.route('/card/move', methods=['PATCH'])
+def card_move():
+    moved_card = request.get_json()
+    return data_handler.move_card(moved_card)
 
 
 @app.route('/registration', methods=['POST'])

@@ -37,6 +37,16 @@ export let dataHandler = {
         })
             .then(response => response.json())
     },
+    _api_delete: function(url, data){
+        return fetch(url, {
+            method: 'DELETE',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+    },
     init: function () {
     },
     getBoards: function (callback) {
@@ -86,5 +96,25 @@ export let dataHandler = {
         const newNameData = {'id': parentId, 'title': newName};
         const url = `/${type}/${parentId}`;
         return this._api_patch(url, newNameData);
+    },
+
+    deleteCard: function (cardId) {
+        const cardData = {'id': cardId};
+        const url = `/card/${cardId}`;
+
+        return this._api_delete(url, cardData)
+    },
+    
+    isEntityFull: function (container, entity, counter, callback) {
+        const postData = {entity: entity, counter: counter};
+        const url = `/${container}/${counter}/${entity}`;
+
+        return this._api_post(url, postData, callback)
+    },
+
+    updateCard: function (statusId, cardId) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
     }
 };

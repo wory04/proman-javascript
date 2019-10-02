@@ -76,8 +76,8 @@ export let dataHandler = {
         return this._api_post(newStatusUrl, newStatusBoard, callback);
     },
 
-    createNewCard: function (statusId, callback) {
-        const newCardStatus = {'statusId': `${statusId}`};
+    createNewCard: function (statusId, newCardPosition, callback) {
+        const newCardStatus = {'statusId': `${statusId}`, 'position': newCardPosition};
         const newCardUrl = '/card';
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
@@ -87,6 +87,7 @@ export let dataHandler = {
         const url = `/${type}/${parentId}`;
         return this._api_patch(url, newNameData);
     },
+
     updateCard: function (statusId, cardId) {
         const movedCard = {'statusId': statusId, 'cardId': cardId};
         const url = `/card/move`;

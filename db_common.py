@@ -70,15 +70,27 @@ def update_title_by_id(cursor, id_number, title, table):
 
 
 @db_connection.connection_handler
-def update_card(cursor, status_id, card_id):
-    cursor.execute(
-        sql.SQL(
-            """
-            UPDATE card
-            SET status_id = %(status_id)s
-            WHERE id = %(card_id)s
-            RETURNING *;
-            """
-        ), {'status_id': status_id, 'card_id': card_id})
+def delete_card_by_id(cursor, card_id):
+    cursor.execute(sql.SQL('''
+                    DELETE FROM card
+                    WHERE id = %(card_id)s
+                    RETURNING *
+                    '''), {'card_id': card_id})
+
+    result = cursor.fetchone()
+    return result
+
+
+@db_connection.connection_handler
+def check_entity_is_full(cursor, column, counter, entity):
+    cursor.execute(sql.SQL('''
+                    SELECT  CASE
+                                WHEN COUNT({column}) < 8 THEN FALSE
+                                ELSE TRUE
+                            END AS count
+                    FROM {entity}
+                    WHERE {column} = %(counter)s;
+                    ''').format(column=sql.Identifier(column), entity=sql.Identifier(entity)), {'counter': counter})
+
     result = cursor.fetchone()
     return result

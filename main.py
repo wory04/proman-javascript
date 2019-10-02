@@ -67,8 +67,7 @@ def manipulate_card(id):
         card_data = request.get_json()
         return data_handler.rename_card(card_data)
     elif request.method == 'DELETE':
-        card_data = request.get_json()
-        return data_handler.delete_card(card_data)
+        return data_handler.delete_card(id)
 
 
 def main():

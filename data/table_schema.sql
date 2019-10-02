@@ -22,7 +22,8 @@ CREATE TABLE status (
 CREATE TABLE card (
     id SERIAL NOT NULL PRIMARY KEY,
     title VARCHAR(200) NOT NULL DEFAULT 'New Card',
-    status_id INTEGER NOT NULL
+    status_id INTEGER NOT NULL,
+    position INTEGER NOT NULL
 );
 
 ALTER TABLE ONLY status
@@ -53,14 +54,14 @@ INSERT INTO status (id, title, board_id) VALUES (14, 'Release', 3);
 SELECT pg_catalog.setval('status_id_seq', 14, true);
 
 
-INSERT INTO card (id, title, status_id) VALUES (1, 'Task 1', 1);
-INSERT INTO card (id, title, status_id) VALUES (2, 'Task 2', 1);
-INSERT INTO card (id, title, status_id) VALUES (3, 'Task 3', 1);
-INSERT INTO card (id, title, status_id) VALUES (4, 'Task 4', 2);
-INSERT INTO card (id, title, status_id) VALUES (5, 'Task 5', 9);
-INSERT INTO card (id, title, status_id) VALUES (6, 'Task 6', 10);
-INSERT INTO card (id, title, status_id) VALUES (7, 'Task 7', 11);
-INSERT INTO card (id, title, status_id) VALUES (8, 'Task 8', 12);
-INSERT INTO card (id, title, status_id) VALUES (9, 'Task 9', 13);
-INSERT INTO card (id, title, status_id) VALUES (10, 'Task 10', 14);
+INSERT INTO card (id, title, status_id, position) VALUES (1, 'Task 1', 1, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (2, 'Task 2', 1, 2);
+INSERT INTO card (id, title, status_id, position) VALUES (3, 'Task 3', 1, 3);
+INSERT INTO card (id, title, status_id, position) VALUES (4, 'Task 4', 2, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (5, 'Task 5', 9, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (6, 'Task 6', 10, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (7, 'Task 7', 11, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (8, 'Task 8', 12, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (9, 'Task 9', 13, 1);
+INSERT INTO card (id, title, status_id, position) VALUES (10, 'Task 10', 14, 1);
 SELECT pg_catalog.setval('card_id_seq', 10, true);

@@ -168,9 +168,16 @@ export let dom = {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
-        dataHandler.createNewCard(statusId, dom.cardTemplate)
-            .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
-            .then(currentCard => dom.addEventListenersToCard(currentCard));
+        dataHandler.isEntityFull('status', 'card', statusId, dom.isFull)
+            .then(boolean => {
+                if (boolean.count) {
+                    alert('This column has reached its maximum capacity')
+                } else {
+                    dataHandler.createNewCard(statusId, dom.cardTemplate)
+                        .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
+                        .then(currentCard => dom.addEventListenersToCard(currentCard));
+                }
+            });
     },
     renameHandler: function (event) {
         const currentName = String(event.target.innerText);

@@ -130,11 +130,13 @@ export let dom = {
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
-
-        dataHandler.createNewCard(statusId, dom.cardTemplate)
+        let numberOfCardsInStatus = dom.countCardsInStatus(statusContainer);
+        let newCardPosition = parseInt(numberOfCardsInStatus) + 1;
+        dataHandler.createNewCard(statusId, newCardPosition, dom.cardTemplate)
             .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
             );
     },
+
     renameHandler: function (event) {
         const currentName = event.target.innerText;
         event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
@@ -285,4 +287,14 @@ export let dom = {
     },
 
 
+    handleMouseMove: function (event) {
+        let mouseOffset = event.pageY;
+        let supposed = event.pageYOffset;
+        console.log(mouseOffset)
+        console.log(supposed)
+    },
+
+    countCardsInStatus: function (statusContainer) {
+        return statusContainer.querySelectorAll('.card').length;
+    }
 };

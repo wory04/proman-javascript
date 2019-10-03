@@ -18,7 +18,7 @@ export let dom = {
     },
     _deleteCard: function(cardData) {
         const cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
-        let cardContainer = cardToRemove.parentElement;
+        const cardContainer = cardToRemove.parentElement;
         cardContainer.removeChild(cardToRemove);
     },
     init: function () {

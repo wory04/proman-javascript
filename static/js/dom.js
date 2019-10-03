@@ -103,7 +103,10 @@ export let dom = {
         for (let board of boards) {
             if ([parseInt(document.querySelector('.nav-container').dataset.currentuserid), null].includes(board.user_id)) {
                 let newBoard = this.boardTemplate(board);
-                this._appendToElement(elementToExtend, newBoard, false);
+                let currentBoard = this._appendToElement(elementToExtend, newBoard, false);
+                if (board.user_id !== null) {
+                    currentBoard.classList.add('private');
+                }
                 for (let statuses of board.statuses) {
                     if (statuses.length !== 0) {
                         let newStatus = this.statusTemplate(statuses);
@@ -161,6 +164,12 @@ export let dom = {
             .then(() => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
             .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
             .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler))
+            .then(() => {
+                let newBoard = boards.lastElementChild;
+                if (isPrivate) {
+                    newBoard.classList.add('private');
+                }
+            })
     },
 
     openBoardHandler: function (event) {

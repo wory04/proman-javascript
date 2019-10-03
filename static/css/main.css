@@ -59,6 +59,10 @@ button{
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
+.private .board-header{
+    background: #D7E5E8;
+}
+
 .board-title{
     margin: 13px;
     display: inline-block;

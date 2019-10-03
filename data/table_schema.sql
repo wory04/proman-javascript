@@ -22,15 +22,13 @@ CREATE TABLE board (
 CREATE TABLE status (
     id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL DEFAULT 'New Status',
-    board_id INTEGER NOT NULL,
-    user_id INTEGER
+    board_id INTEGER NOT NULL
 );
 
 CREATE TABLE card (
     id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL DEFAULT 'New Card',
-    status_id INTEGER NOT NULL,
-    user_id INTEGER
+    status_id INTEGER NOT NULL
 );
 
 CREATE TABLE user_info (
@@ -45,10 +43,6 @@ ALTER TABLE ONLY card
     ADD CONSTRAINT fk_card_status_id FOREIGN KEY (status_id) REFERENCES  status(id);
 ALTER TABLE ONLY board
     ADD CONSTRAINT fk_board_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
-ALTER TABLE ONLY status
-    ADD CONSTRAINT fk_status_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
-ALTER TABLE ONLY card
-    ADD CONSTRAINT fk_card_info_user_id FOREIGN KEY (user_id) REFERENCES  user_info(id);
 
 
 INSERT INTO board (id, title) VALUES (1, 'Feature 1');

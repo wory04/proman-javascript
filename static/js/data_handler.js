@@ -73,10 +73,14 @@ export let dataHandler = {
     getCard: function (cardId, callback) {
         // the card is retrieved and then the callback function is called with the card
     },
-    createNewBoard: function (callback) {
+    createNewBoard: function (isPrivate, callback) {
         // creates new board, saves it and calls the callback function with its data
         let postData = {};
-        return this._api_post('/board', postData, callback)
+        if (isPrivate) {
+            return this._api_post('/private-board', postData, callback)
+        } else {
+            return this._api_post('/board', postData, callback)
+        }
     },
 
     createNewStatus: function (boardId, callback) {

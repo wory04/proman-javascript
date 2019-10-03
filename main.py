@@ -13,7 +13,8 @@ def index():
     This is a one-pager which shows all the boards and cards
     """
     username = session.get('username')
-    return render_template('index.html', username=username)
+    user_id = data_handler.get_user_id(username)['id'] if username else None
+    return render_template('index.html', username=username, user_id=user_id)
 
 
 @app.route("/get-boards")
@@ -46,6 +47,14 @@ def create_status():
 @json_response
 def create_board():
     return data_handler.create_new_board()
+
+
+@app.route('/private-board', methods=['POST'])
+@json_response
+def create_private_board():
+    username = session.get('username')
+    user_id = data_handler.get_user_id(username)['id']
+    return data_handler.create_new_board(user_id)
 
 
 @app.route('/board/<id>', methods=['PATCH'])

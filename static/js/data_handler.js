@@ -37,6 +37,15 @@ export let dataHandler = {
         })
             .then(response => response.json())
     },
+    _api_delete: function(url){
+        return fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+    },
     init: function () {
     },
     getBoards: function (callback) {
@@ -64,10 +73,14 @@ export let dataHandler = {
     getCard: function (cardId, callback) {
         // the card is retrieved and then the callback function is called with the card
     },
-    createNewBoard: function (callback) {
+    createNewBoard: function (isPrivate, callback) {
         // creates new board, saves it and calls the callback function with its data
         let postData = {};
-        return this._api_post('/board', postData, callback)
+        if (isPrivate) {
+            return this._api_post('/private-board', postData, callback)
+        } else {
+            return this._api_post('/board', postData, callback)
+        }
     },
 
     createNewStatus: function (boardId, callback) {
@@ -86,5 +99,24 @@ export let dataHandler = {
         const newNameData = {'id': parentId, 'title': newName};
         const url = `/${type}/${parentId}`;
         return this._api_patch(url, newNameData);
+    },
+
+    deleteCard: function (cardId) {
+        const url = `/card/${cardId}`;
+
+        return this._api_delete(url);
+    },
+
+    isEntityFull: function (container, entity, counter, callback) {
+        const postData = {entity: entity, counter: counter};
+        const url = `/${container}/${counter}/${entity}`;
+
+        return this._api_post(url, postData, callback)
+    },
+
+    updateCard: function (statusId, cardId) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
     }
 };

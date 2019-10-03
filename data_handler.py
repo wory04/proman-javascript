@@ -40,4 +40,21 @@ def rename_status(status_data):
 def move_card(moved_card):
     status_id = moved_card['statusId']
     card_id = moved_card['cardId']
-    return db_common.update_card(status_id, card_id)
+    card_position = moved_card['position']
+    old_status = db_common.get_old_status_id(card_id)
+    cards_to_modify = db_common.get_cards_to_modify_position(card_id, old_status['status_id'])
+    data = db_common.update_card(status_id, card_id, card_position)
+    if cards_to_modify:
+        for card in cards_to_modify:
+            db_common.update_cards_position(card['id'], -1)
+    return data
+
+
+def move_cards(moved_cards):
+    new_card_index = moved_cards['newCard']
+    card_ids = moved_cards['cards']
+    cards_to_update = card_ids[int(new_card_index) + 1:]
+    if cards_to_update:
+        for card_id in cards_to_update:
+            db_common.update_cards_position(card_id, 1)
+    return {}

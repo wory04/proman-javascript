@@ -17,7 +17,8 @@ def index():
     This is a one-pager which shows all the boards and cards
     """
     username = session.get('username')
-    return render_template('index.html', username=username)
+    user_id = data_handler.get_user_id(username)['id'] if username else None
+    return render_template('index.html', username=username, user_id=user_id)
 
 
 @app.route("/get-boards")
@@ -33,8 +34,9 @@ def get_boards():
 @json_response
 def add_new_card():
     new_card_status = request.get_json()['statusId']
+    new_card_position = request.get_json()['position']
 
-    new_card = data_handler.create_new_card(new_card_status)
+    new_card = data_handler.create_new_card(new_card_status, new_card_position)
 
     return new_card
 
@@ -50,6 +52,14 @@ def create_status():
 @json_response
 def create_board():
     return data_handler.create_new_board()
+
+
+@app.route('/private-board', methods=['POST'])
+@json_response
+def create_private_board():
+    username = session.get('username')
+    user_id = data_handler.get_user_id(username)['id']
+    return data_handler.create_new_board(user_id)
 
 
 @app.route('/board/<id>', methods=['PATCH'])
@@ -68,13 +78,12 @@ def rename_status(id):
 
 @app.route('/card/<id>', methods=['PATCH', 'DELETE'])
 @json_response
-def rename_card(id):
+def manipulate_card(id):
     if request.method == 'PATCH':
         card_data = request.get_json()
         return data_handler.rename_card(card_data)
     elif request.method == 'DELETE':
-        card_data = request.get_json()
-        return data_handler.delete_card(card_data)
+        return data_handler.delete_card(id)
 
 
 @app.route('/board/<id>/status', methods=['POST'])
@@ -95,6 +104,12 @@ def check_number_of_statuses_by_status_id(id):
 def card_move():
     moved_card = request.get_json()
     return data_handler.move_card(moved_card)
+
+
+@app.route('/cards/move', methods=['PATCH'])
+def cards_move():
+    moved_cards = request.get_json()
+    return data_handler.move_cards(moved_cards)
 
 
 @app.route('/registration', methods=['POST'])

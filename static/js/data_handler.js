@@ -13,8 +13,8 @@ export let dataHandler = {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(response => response.json())  // parse the response as JSON
-        .then(json_response => callback(json_response));  // Call the `callback` with the returned object
+            .then(response => response.json())  // parse the response as JSON
+            .then(json_response => callback(json_response));  // Call the `callback` with the returned object
     },
     _api_post: function (url, data, callback) {
         return fetch(url, {
@@ -37,10 +37,9 @@ export let dataHandler = {
         })
             .then(response => response.json())
     },
-    _api_delete: function(url, data){
+    _api_delete: function(url){
         return fetch(url, {
             method: 'DELETE',
-            body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -74,10 +73,14 @@ export let dataHandler = {
     getCard: function (cardId, callback) {
         // the card is retrieved and then the callback function is called with the card
     },
-    createNewBoard: function (callback) {
+    createNewBoard: function (isPrivate, callback) {
         // creates new board, saves it and calls the callback function with its data
         let postData = {};
-        return this._api_post('/board', postData, callback)
+        if (isPrivate) {
+            return this._api_post('/private-board', postData, callback)
+        } else {
+            return this._api_post('/board', postData, callback)
+        }
     },
 
     createNewStatus: function (boardId, callback) {
@@ -86,8 +89,8 @@ export let dataHandler = {
         return this._api_post(newStatusUrl, newStatusBoard, callback);
     },
 
-    createNewCard: function (statusId, callback) {
-        const newCardStatus = {'statusId': `${statusId}`};
+    createNewCard: function (statusId, newCardPosition, callback) {
+        const newCardStatus = {'statusId': `${statusId}`, 'position': newCardPosition};
         const newCardUrl = '/card';
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
@@ -98,23 +101,28 @@ export let dataHandler = {
         return this._api_patch(url, newNameData);
     },
 
-    deleteCard: function (cardId) {
-        const cardData = {'id': cardId};
+    updateCard: function (statusId, cardId, cardPosition) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId, 'position': cardPosition};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
+    },
+
+    updateCards: function (statusId, CardsId, newCardIndex) {
+        const movedCards = {'cards': CardsId, 'statusId': statusId, 'newCard': newCardIndex};
+        const url = '/cards/move';
+        return this._api_patch(url, movedCards)
+    },
+
+     deleteCard: function (cardId) {
         const url = `/card/${cardId}`;
 
-        return this._api_delete(url, cardData)
+        return this._api_delete(url);
     },
-    
+
     isEntityFull: function (container, entity, counter, callback) {
         const postData = {entity: entity, counter: counter};
         const url = `/${container}/${counter}/${entity}`;
 
         return this._api_post(url, postData, callback)
     },
-
-    updateCard: function (statusId, cardId) {
-        const movedCard = {'statusId': statusId, 'cardId': cardId};
-        const url = `/card/move`;
-        return this._api_patch(url, movedCard);
-    }
 };

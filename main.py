@@ -1,10 +1,14 @@
 from flask import Flask, render_template, url_for, request, session, jsonify, make_response
 from util import json_response
+from flask_socketio import SocketIO
 
 import data_handler
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.debug = True
+
+socket = SocketIO(app)
 
 
 @app.route("/")
@@ -125,8 +129,29 @@ def route_logout():
     return make_response(jsonify(response), 200)
 
 
+@app.route('/call_socket')
+def call_socket():
+    socket.emit('data-changed', {'id': 2, 'x': 120, 'y': 350})
+    return '', 204
+
+
+@socket.on('drag_data')
+def on_drag_card(data):
+    socket.emit('data-changed', data, include_self=False)
+
+
+@socket.on('drag_end')
+def on_drag_end_card():
+    socket.emit('drag_end', include_self=False)
+
+
+@socket.on('drop')
+def on_drop_card(data):
+    socket.emit('drop', data, include_self=False)
+
+
 def main():
-    app.run(debug=True)
+    socket.run(app)
 
     # Serving the favicon
     with app.app_context():

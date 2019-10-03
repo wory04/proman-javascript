@@ -1,5 +1,6 @@
 import { dom } from "./dom.js";
 import { reglog } from "./reglog.js";
+import { sync } from "./sync.js";
 
 // This function is to initialize the application
 function init() {
@@ -10,6 +11,7 @@ function init() {
     // init reglog
     reglog.init();
 
+    sync.init();
 }
 
 init();

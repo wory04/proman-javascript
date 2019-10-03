@@ -1,5 +1,6 @@
 // It uses data_handler.js to visualize elements
 import {dataHandler} from "./data_handler.js";
+import {sync} from "./sync.js";
 
 export let dom = {
     _appendToElement: function (elementToExtend, textToAppend, prepend = false) {
@@ -273,13 +274,17 @@ export let dom = {
         for (let dropzone of dropzones){
             dropzone.classList.add('dropzone')
         }
+
+        sync.setDragStartCoordinates(event.pageX - event.target.offsetLeft, event.pageY - event.target.offsetTop);
     },
 
     dragEndHandler: function (event){
         event.target.dataset.dragged = "false";
+        sync.sendDragEndData();
     },
 
     dragOverHandler: function (event){
+        sync.sendDragData(event.target.id, event.pageX, event.pageY);
         event.preventDefault();
     },
 
@@ -306,6 +311,8 @@ export let dom = {
             let statusId = event.target.parentElement.id;
             let cardId = dragged.id;
             dataHandler.updateCard(statusId, cardId);
+
+            sync.sendDropData(statusId, cardId);
         }
         if (dragged) {
             dragged.dataset.dragged = 'false';
@@ -321,6 +328,13 @@ export let dom = {
             dropzone.classList.remove('dropzone');
         }
 
-    }
+    },
 
+    changeCardStatus: (statusId, cardId) => {
+        const card = document.querySelector(`.card[id="${cardId}"]`);
+        const newStatusContainer = document.querySelector(`.status[id="${statusId}"] .cards`);
+
+        card.parentNode.removeChild(card);
+        newStatusContainer.appendChild(card);
+    }
 };

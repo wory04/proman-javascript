@@ -169,3 +169,8 @@ button{
 .navbar{
     background-color: #494454;
 }
+
+.hover-card{
+    opacity: 0.5;
+    position: absolute;
+}

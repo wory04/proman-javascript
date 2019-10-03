@@ -44,13 +44,13 @@ def insert_into_inner_table(cursor, table, id_type, id_value):
 
 
 @db_connection.connection_handler
-def create_new_board(cursor):
+def create_new_board(cursor, user_id=None):
     cursor.execute(
         sql.SQL("""
-            INSERT INTO board
-            DEFAULT VALUES 
+            INSERT INTO board (user_id)
+            VALUES (%(user_id)s)
             RETURNING *;
-            """))
+            """), {'user_id': user_id})
     result = cursor.fetchone()
 
     return result
@@ -76,7 +76,6 @@ def delete_card_by_id(cursor, card_id):
                     WHERE id = %(card_id)s
                     RETURNING *
                     '''), {'card_id': card_id})
-
     result = cursor.fetchone()
     return result
 
@@ -141,3 +140,12 @@ def get_all_users(cursor):
     user_names = cursor.fetchall()
 
     return user_names
+
+
+@db_connection.connection_handler
+def get_user_id_by_username(cursor, username):
+    query_for_pwd = sql.SQL("SELECT id FROM user_info WHERE name = {}").format(sql.Placeholder())
+    cursor.execute(query_for_pwd, [username])
+    user_id = cursor.fetchone()
+
+    return user_id

@@ -25,8 +25,8 @@ def create_new_status(status_board):
     return db_common.insert_into_inner_table(status_table, status_board_column, status_board)
 
 
-def create_new_board():
-    return db_common.create_new_board()
+def create_new_board(user_id=None):
+    return db_common.create_new_board(user_id)
 
 
 def rename_board(board_data):
@@ -79,3 +79,7 @@ def validate_login(user_data):
         password = db_common.get_password_by_username(user_data['username'])['password']
         return util.verify_password(user_data['password'], password)
     return False
+
+
+def get_user_id(username):
+    return db_common.get_user_id_by_username(username)

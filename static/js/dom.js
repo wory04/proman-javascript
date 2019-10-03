@@ -2,14 +2,14 @@
 import {dataHandler} from "./data_handler.js";
 
 export let dom = {
-    _appendToElement: function (elementToExtend, textToAppend, prepend = false) {
+    _appendToElement: function (elementToExtend, textToAppend, prepend = false, referenceNode = null) {
         // function to append new DOM elements (represented by a string) to an existing DOM element
         let fakeDiv = document.createElement('div');
         fakeDiv.innerHTML = textToAppend.trim();
 
         for (let childNode of fakeDiv.childNodes) {
             if (prepend) {
-                elementToExtend.prependChild(childNode);
+                elementToExtend.insertBefore(childNode, referenceNode);
             } else {
                 elementToExtend.appendChild(childNode);
             }
@@ -201,10 +201,9 @@ export let dom = {
             </div>`
     },
 
+    initDrag: function () {
 
-    initDrag: function (){
-
-        document.addEventListener('drag', function(event) {
+        document.addEventListener('drag', function (event) {
 
         }, false);
         document.addEventListener('dragstart', dom.dragStartHandler, false);
@@ -217,84 +216,127 @@ export let dom = {
 
     },
 
-    dragStartHandler: function (event){
+    dragStartHandler: function (event) {
         event.target.dataset.dragged = "true";
         let boardBody = event.target.parentElement.parentElement.parentElement;
         let dropzones = boardBody.querySelectorAll('.status > .cards');
-        for (let dropzone of dropzones){
+        for (let dropzone of dropzones) {
             dropzone.classList.add('dropzone')
         }
     },
 
-    dragEndHandler: function (event){
+    dragEndHandler: function (event) {
         event.target.dataset.dragged = "false";
     },
 
-    dragOverHandler: function (event){
+    dragOverHandler: function (event) {
         event.preventDefault();
     },
 
-     dragEnterHandler: function (event){
-        if (event.target.classList.contains("dropzone") ) {
+    dragEnterHandler: function (event) {
+        if (event.target.classList.contains("dropzone")) {
             event.target.style.background = "grey";
 
-      }
+        }
     },
 
-     dragLeaveHandler: function (event){
-         if (event.target.classList.contains("dropzone")) {
+    dragLeaveHandler: function (event) {
+        if (event.target.classList.contains("dropzone")) {
             event.target.style.background = "";
-      }
+        }
     },
 
-    dropHandler: function (event){
+    dropHandler: function (event) {
         let dragged = document.querySelector("[data-dragged='true']");
         event.preventDefault();
         let currentElement = event.target;
-        while (!currentElement.classList.contains('dropzone')){
+
+        while (!currentElement.classList.contains('dropzone')) {
             currentElement = currentElement.parentElement;
         }
-        if (currentElement.classList.contains('dropzone') ) {
+
+        if (currentElement.classList.contains('dropzone')) {
             currentElement.style.background = "";
             dragged.parentNode.removeChild(dragged);
+            let data = dom.defineCardsPositions(event, currentElement);
+            let newCardIndex = data['cardIndex'];
+            let prependBoolean = data['boolean'];
+            let referenceChild = data['reference'];
             let statusId = currentElement.parentElement.id;
             let cardId = dragged.id;
 
-            dataHandler.updateCard(statusId, cardId)
+            dataHandler.updateCard(statusId, cardId, newCardIndex)
                 .then(response => dom.cardTemplate(response))
-                .then(card => dom._appendToElement(currentElement, card, false))
-                .then(appendCard => dom.getIndexOfCard(currentElement, appendCard))
+                .then(card => dom._appendToElement(currentElement, card, prependBoolean, referenceChild))
+                .then(() => dom.getShiftedCardsId(currentElement))
+                .then((CardsIds) => {
+                    if (CardsIds) {
+                        dataHandler.updateCards(statusId, CardsIds, newCardIndex)
+                    }
+                })
         }
         if (dragged) {
             dragged.dataset.dragged = 'false';
             dragged = null;
             dom.removeDropzones();
-
         }
-
     },
+
     removeDropzones: function () {
         let dropzones = document.querySelectorAll('.dropzone');
-        for (let dropzone of dropzones){
+        for (let dropzone of dropzones) {
             dropzone.classList.remove('dropzone');
         }
-
     },
 
-    getIndexOfCard: function (currentElement, dragged){
-        let movedCardPosition = Array.from(currentElement.children).indexOf(dragged);
-        console.log(movedCardPosition);
+    defineCardsPositions: function (event, currentElement) {
+        let cardsOffset = dom.getCardsOffset(currentElement);
+        let mousePosition = event.clientY;
+        let data = {};
+        if (cardsOffset.length === 0) {
+            data['cardIndex'] = 0;
+            data['boolean'] = false;
+            data['reference'] = null;
+        } else {
+            data['cardIndex'] = dom.findPositionForCard(cardsOffset, mousePosition);
+            if (data['cardIndex'] === 0) {
+                data['reference'] = currentElement.children[1];
+                data['boolean'] = true;
+            } else {
+                data['reference'] = currentElement.children[data['cardIndex']];
+                data['boolean'] = true;
+            }
+        }
+        return data
     },
 
-
-    handleMouseMove: function (event) {
-        let mouseOffset = event.pageY;
-        let supposed = event.pageYOffset;
-        console.log(mouseOffset)
-        console.log(supposed)
+    getCardsOffset: function (cardsParent) {
+        let cards = cardsParent.querySelectorAll('.card');
+        let cardsOffset = [];
+        for (let card of cards) {
+            cardsOffset.push(card.getBoundingClientRect().y);
+        }
+        return cardsOffset
     },
 
     countCardsInStatus: function (statusContainer) {
         return statusContainer.querySelectorAll('.card').length;
-    }
+    },
+
+    findPositionForCard: function (cardsOffset, mouseOffset) {
+        cardsOffset.push(mouseOffset);
+        cardsOffset.sort();
+        return cardsOffset.indexOf(mouseOffset)
+    },
+
+    getShiftedCardsId: function (currentElement) {
+        let cardsToUpdate = currentElement.querySelectorAll('.card');
+        if (cardsToUpdate.length > 1) {
+            let cardIdsToUpdate = [];
+            for (let cardToUpdate of cardsToUpdate) {
+                cardIdsToUpdate.push(cardToUpdate.id)
+            }
+            return cardIdsToUpdate
+        }
+    },
 };

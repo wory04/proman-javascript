@@ -5,9 +5,9 @@ import util
 def get_boards_with_content():
     boards = db_common.get_all_from_table('board')
     for board in boards:
-        board['statuses'] = db_common.get_all_from_table_by_outer_table_id('status', 'board_id', str(board['id']))
+        board['statuses'] = db_common.get_all_from_table_by_outer_table_id('status', 'board_id', str(board['id']), 'id')
         for status in board['statuses']:
-            status['cards'] = db_common.get_all_from_table_by_outer_table_id('card', 'status_id', str(status['id']))
+            status['cards'] = db_common.get_all_from_table_by_outer_table_id('card', 'status_id', str(status['id']), 'position')
     return boards
 
 

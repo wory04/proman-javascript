@@ -14,13 +14,14 @@ def get_all_from_table(cursor, table):
 
 
 @db_connection.connection_handler
-def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value):
+def get_all_from_table_by_outer_table_id(cursor, table, id_type, id_value, ordering):
     query_for_all_from_inner_by_outer_table = sql.SQL('''
-        SELECT * FROM {} WHERE {} = {} ORDER BY id ASC;
+        SELECT * FROM {} WHERE {} = {} ORDER BY {} ASC;
         ''').format(
         sql.Identifier(table),
         sql.Identifier(id_type),
         sql.SQL(id_value),
+        sql.Identifier(ordering)
     )
     cursor.execute(query_for_all_from_inner_by_outer_table)
     result = cursor.fetchall()

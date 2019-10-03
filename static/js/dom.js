@@ -219,9 +219,9 @@ export let dom = {
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
+        const parentId = event.target.classList[0] === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            let containerClassName = event.target.parentElement.classList[0] === 'card-title' ? event.target.parentElement.parentElement.classList[0] : event.target.parentElement.parentElement.parentElement.classList[0];
             if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {

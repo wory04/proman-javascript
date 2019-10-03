@@ -13,8 +13,8 @@ export let dataHandler = {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(response => response.json())  // parse the response as JSON
-        .then(json_response => callback(json_response));  // Call the `callback` with the returned object
+            .then(response => response.json())  // parse the response as JSON
+            .then(json_response => callback(json_response));  // Call the `callback` with the returned object
     },
     _api_post: function (url, data, callback) {
         return fetch(url, {
@@ -82,15 +82,21 @@ export let dataHandler = {
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
 
-    renameTitle: function(parentId, newName, type){
+    renameTitle: function (parentId, newName, type) {
         const newNameData = {'id': parentId, 'title': newName};
         const url = `/${type}/${parentId}`;
         return this._api_patch(url, newNameData);
     },
 
-    updateCard: function (statusId, cardId) {
-        const movedCard = {'statusId': statusId, 'cardId': cardId};
+    updateCard: function (statusId, cardId, cardPosition) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId, 'position': cardPosition};
         const url = `/card/move`;
         return this._api_patch(url, movedCard);
+    },
+
+    updateCards: function (statusId, CardsId, newCardIndex) {
+        const movedCards = {'cards': CardsId, 'statusId': statusId, 'newCard': newCardIndex};
+        const url = '/cards/move';
+        return this._api_patch(url, movedCards)
     }
 };

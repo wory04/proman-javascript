@@ -67,6 +67,12 @@ def card_move():
     return data_handler.move_card(moved_card)
 
 
+@app.route('/cards/move', methods=['PATCH'])
+def cards_move():
+    moved_cards = request.get_json()
+    return data_handler.move_cards(moved_cards)
+
+
 def main():
     app.run(debug=True)
 

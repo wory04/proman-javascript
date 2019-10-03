@@ -23,13 +23,10 @@ export const sync = {
             sync.hoverCard.style.top = `${data.y}px`;
         });
 
-        sync.socket.on('drag_end', () => {
-            sync.hoverCard.remove();
-            sync.hoverCard = undefined;
-        });
-
         sync.socket.on('drop', (data) => {
             dom.changeCardStatus(data.statusId, data.cardId);
+            sync.hoverCard.remove();
+            sync.hoverCard = undefined;
         });
     },
     setDragStartCoordinates: (x, y) => {
@@ -41,9 +38,6 @@ export const sync = {
             x: x - sync.dragStartPosition.x,
             y: y - sync.dragStartPosition.y
         });
-    },
-    sendDragEndData: () => {
-        sync.socket.emit('drag_end');
     },
     sendDropData: (statusId, cardId) => {
         sync.socket.emit('drop', {statusId, cardId});

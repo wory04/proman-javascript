@@ -144,20 +144,9 @@ def route_logout():
     return make_response(jsonify(response), 200)
 
 
-@app.route('/call_socket')
-def call_socket():
-    socket.emit('data-changed', {'id': 2, 'x': 120, 'y': 350})
-    return '', 204
-
-
 @socket.on('drag_data')
 def on_drag_card(data):
     socket.emit('data-changed', data, include_self=False)
-
-
-@socket.on('drag_end')
-def on_drag_end_card():
-    socket.emit('drag_end', include_self=False)
 
 
 @socket.on('drop')

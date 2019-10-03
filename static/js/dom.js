@@ -316,7 +316,7 @@ export let dom = {
     },
 
     dragOverHandler: function (event) {
-        sync.sendDragData(event.target.id, event.pageX, event.pageY);
+        sync.sendDragData(event.target.id || event.target.parentElement.id, event.pageX, event.pageY);
         event.preventDefault();
     },
 

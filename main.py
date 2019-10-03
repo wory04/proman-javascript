@@ -30,8 +30,9 @@ def get_boards():
 @json_response
 def add_new_card():
     new_card_status = request.get_json()['statusId']
+    new_card_position = request.get_json()['position']
 
-    new_card = data_handler.create_new_card(new_card_status)
+    new_card = data_handler.create_new_card(new_card_status, new_card_position)
 
     return new_card
 
@@ -99,6 +100,12 @@ def check_number_of_statuses_by_status_id(id):
 def card_move():
     moved_card = request.get_json()
     return data_handler.move_card(moved_card)
+
+
+@app.route('/cards/move', methods=['PATCH'])
+def cards_move():
+    moved_cards = request.get_json()
+    return data_handler.move_cards(moved_cards)
 
 
 @app.route('/registration', methods=['POST'])

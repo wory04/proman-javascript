@@ -13,8 +13,8 @@ export let dataHandler = {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(response => response.json())  // parse the response as JSON
-        .then(json_response => callback(json_response));  // Call the `callback` with the returned object
+            .then(response => response.json())  // parse the response as JSON
+            .then(json_response => callback(json_response));  // Call the `callback` with the returned object
     },
     _api_post: function (url, data, callback) {
         return fetch(url, {
@@ -89,8 +89,8 @@ export let dataHandler = {
         return this._api_post(newStatusUrl, newStatusBoard, callback);
     },
 
-    createNewCard: function (statusId, callback) {
-        const newCardStatus = {'statusId': `${statusId}`};
+    createNewCard: function (statusId, newCardPosition, callback) {
+        const newCardStatus = {'statusId': `${statusId}`, 'position': newCardPosition};
         const newCardUrl = '/card';
         return this._api_post(newCardUrl, newCardStatus, callback);
     },
@@ -101,7 +101,19 @@ export let dataHandler = {
         return this._api_patch(url, newNameData);
     },
 
-    deleteCard: function (cardId) {
+    updateCard: function (statusId, cardId, cardPosition) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId, 'position': cardPosition};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
+    },
+
+    updateCards: function (statusId, CardsId, newCardIndex) {
+        const movedCards = {'cards': CardsId, 'statusId': statusId, 'newCard': newCardIndex};
+        const url = '/cards/move';
+        return this._api_patch(url, movedCards)
+    },
+
+     deleteCard: function (cardId) {
         const url = `/card/${cardId}`;
 
         return this._api_delete(url);
@@ -113,10 +125,4 @@ export let dataHandler = {
 
         return this._api_post(url, postData, callback)
     },
-
-    updateCard: function (statusId, cardId) {
-        const movedCard = {'statusId': statusId, 'cardId': cardId};
-        const url = `/card/move`;
-        return this._api_patch(url, movedCard);
-    }
 };

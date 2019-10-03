@@ -25,6 +25,7 @@ export let dom = {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
+        this.dragStart()
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -32,6 +33,11 @@ export let dom = {
             dom.showBoards(boards);
         });
     },
+
+    isFull: function (countBoolean) {
+        return countBoolean;
+    },
+
     addNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
         for (let boardName of boardNames) {
@@ -147,22 +153,36 @@ export let dom = {
         const boardId = event.target.parentElement.parentElement.id;
         const statusContainer = event.target.parentElement.nextElementSibling;
 
-        dataHandler.createNewStatus(boardId, dom.statusTemplate)
-            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false))
-            .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler));
+        dataHandler.isEntityFull('board', 'status', boardId, dom.isFull)
+            .then(boolean => {
+                if (boolean.count) {
+                    alert('This board has reached its maximum capacity');
+                } else {
+                    dataHandler.createNewStatus(boardId, dom.statusTemplate)
+                        .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false))
+                        .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler));
+                }
+            });
     },
 
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
 
-        dataHandler.createNewCard(statusId, dom.cardTemplate)
-            .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
-            .then(currentCard => dom.addEventListenersToCard(currentCard));
+        dataHandler.isEntityFull('status', 'card', statusId, dom.isFull)
+            .then(boolean => {
+                if (boolean.count) {
+                    alert('This column has reached its maximum capacity')
+                } else {
+                    dataHandler.createNewCard(statusId, dom.cardTemplate)
+                        .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
+                        .then(currentCard => dom.addEventListenersToCard(currentCard));
+                }
+            });
     },
     renameHandler: function (event) {
-        const currentName = event.target.innerText;
-        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
+        const currentName = String(event.target.innerText);
+        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="20">`;
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
@@ -172,7 +192,7 @@ export let dom = {
             if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, inputField.value, containerClassName)
+                            dataHandler.renameTitle(parentId, String(inputField.value), containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();
@@ -224,9 +244,83 @@ export let dom = {
 
     cardTemplate: function (card) {
         return `
-            <div class="card" id="${card.id}">
+            <div class="card" id="${card.id}" draggable="true">
                 <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                 <div class="card-title">${card.title}</div>
             </div>`
     },
+
+
+    dragStart: function (){
+
+        document.addEventListener('drag', function(event) {
+
+        }, false);
+        document.addEventListener('dragstart', dom.dragStartHandler, false);
+        document.addEventListener('dragend', dom.dragEndHandler, false);
+        document.addEventListener('dragover', dom.dragOverHandler, false);
+
+        document.addEventListener('dragenter', dom.dragEnterHandler, false);
+        document.addEventListener('dragleave', dom.dragLeaveHandler, false);
+        document.addEventListener('drop', dom.dropHandler, false);
+
+    },
+
+    dragStartHandler: function (event){
+        event.target.dataset.dragged = "true";
+        let boardBody = event.target.parentElement.parentElement.parentElement;
+        let dropzones = boardBody.querySelectorAll('.status > .cards');
+        for (let dropzone of dropzones){
+            dropzone.classList.add('dropzone')
+        }
+    },
+
+    dragEndHandler: function (event){
+        event.target.dataset.dragged = "false";
+    },
+
+    dragOverHandler: function (event){
+        event.preventDefault();
+    },
+
+     dragEnterHandler: function (event){
+        if (event.target.classList.contains("dropzone") ) {
+            event.target.style.background = "grey";
+
+      }
+    },
+
+     dragLeaveHandler: function (event){
+         if (event.target.classList.contains("dropzone")) {
+            event.target.style.background = "";
+      }
+    },
+
+    dropHandler: function (event){
+        let dragged = document.querySelector("[data-dragged='true']");
+        event.preventDefault();
+        if (event.target.classList.contains('dropzone') ) {
+            event.target.style.background = "";
+            dragged.parentNode.removeChild(dragged);
+            event.target.appendChild(dragged);
+            let statusId = event.target.parentElement.id;
+            let cardId = dragged.id;
+            dataHandler.updateCard(statusId, cardId);
+        }
+        if (dragged) {
+            dragged.dataset.dragged = 'false';
+            dragged = null;
+            dom.removeDropzones();
+
+        }
+
+    },
+    removeDropzones: function () {
+        let dropzones = document.querySelectorAll('.dropzone');
+        for (let dropzone of dropzones){
+            dropzone.classList.remove('dropzone');
+        }
+
+    }
+
 };

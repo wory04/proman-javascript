@@ -1,4 +1,5 @@
 import db_common
+import util
 
 
 def get_boards_with_content():
@@ -48,3 +49,32 @@ def rename_card(card_data):
 
 def delete_card(card_id):
     return db_common.delete_card_by_id(card_id)
+
+
+def is_full(column, data):
+    entity = data['entity']
+    counter = data['counter']
+    return db_common.check_entity_is_full(column, counter, entity)
+
+
+def move_card(moved_card):
+    status_id = moved_card['statusId']
+    card_id = moved_card['cardId']
+    return db_common.update_card(status_id, card_id)
+
+
+def new_registration(user_data):
+    user_names = [row['name'] for row in db_common.get_all_users()]
+
+    if user_data['username'] not in user_names:
+        hashed_password = util.hash_password(user_data['password'])
+        new_user = db_common.save_new_registration([user_data['username'], hashed_password])
+        return new_user
+
+
+def validate_login(user_data):
+    is_valid_username = user_data['username'] in [row['name'] for row in db_common.get_all_users()]
+    if is_valid_username:
+        password = db_common.get_password_by_username(user_data['username'])['password']
+        return util.verify_password(user_data['password'], password)
+    return False

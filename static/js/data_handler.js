@@ -100,6 +100,19 @@ export let dataHandler = {
     deleteCard: function (cardId) {
         const url = `/card/${cardId}`;
 
-        return this._api_delete(url)
+        return this._api_delete(url);
+    },
+
+    isEntityFull: function (container, entity, counter, callback) {
+        const postData = {entity: entity, counter: counter};
+        const url = `/${container}/${counter}/${entity}`;
+
+        return this._api_post(url, postData, callback)
+    },
+
+    updateCard: function (statusId, cardId) {
+        const movedCard = {'statusId': statusId, 'cardId': cardId};
+        const url = `/card/move`;
+        return this._api_patch(url, movedCard);
     }
 };

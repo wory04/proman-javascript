@@ -16,9 +16,9 @@ export let dom = {
         }
         return elementToExtend.lastChild;
     },
-    _deleteCard: function (cardData) {
-        let cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
-        let cardContainer = document.querySelector(`.card[id="${cardData.id}"`).parentElement;
+    _deleteCard: function(cardData) {
+        const cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
+        const cardContainer = cardToRemove.parentElement;
         cardContainer.removeChild(cardToRemove);
     },
     init: function () {
@@ -70,7 +70,7 @@ export let dom = {
             cardName.removeEventListener('click', dom.renameHandler);
         }
     },
-    addDeleteEventListener: function () {
+    addDeleteEventListener: function() {
         let deleteButtons = document.querySelectorAll('.fas.fa-trash-alt');
         for (let deleteButton of deleteButtons) {
             deleteButton.addEventListener('click', dom.deleteHandler);
@@ -118,7 +118,7 @@ export let dom = {
 
         this.addNamesEventListener();
         this.addDeleteEventListener();
-    },
+        },
 
     addEventListenersToBoard: function (currentBoard) {
         currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);
@@ -127,7 +127,7 @@ export let dom = {
         currentBoard.querySelector('.board-title').addEventListener('click', dom.renameHandler);
     },
 
-    addEventListenersToCard: function (currentCard) {
+    addEventListenersToCard: function(currentCard) {
         currentCard.querySelector('.fas.fa-trash-alt').addEventListener('click', dom.deleteHandler);
         currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler);
     },
@@ -188,8 +188,8 @@ export let dom = {
         const inputField = document.querySelector('input');
         const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-                let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
-                if (event.code === 'Enter') {
+            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
                             dataHandler.renameTitle(parentId, String(inputField.value), containerClassName)
@@ -210,7 +210,7 @@ export let dom = {
             }
         )
     },
-    deleteHandler: function (event) {
+    deleteHandler: function(event) {
         const cardId = event.target.parentElement.parentElement.id;
         dataHandler.deleteCard(cardId)
             .then(deletedCard => dom._deleteCard(deletedCard))

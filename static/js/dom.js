@@ -38,6 +38,15 @@ export let dom = {
         return countBoolean;
     },
 
+    protectAgainstXSS: function (value) {
+        let lt = /</g,
+            gt = />/g,
+            ap = /'/g,
+            ic = /"/g;
+
+        return value.toString().replace(lt, "&lt;").replace(gt, "&gt;").replace(ap, "&#39;").replace(ic, "&#34;");
+    },
+
     addNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
         for (let boardName of boardNames) {
@@ -181,7 +190,7 @@ export let dom = {
             });
     },
     renameHandler: function (event) {
-        const currentName = String(event.target.innerText);
+        const currentName = dom.protectAgainstXSS(event.target.innerText);
         event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="20">`;
         dom.removeNamesEventListener();
 
@@ -192,7 +201,7 @@ export let dom = {
             if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, String(inputField.value), containerClassName)
+                            dataHandler.renameTitle(parentId, dom.protectAgainstXSS(inputField.value), containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();
@@ -251,9 +260,9 @@ export let dom = {
     },
 
 
-    dragStart: function (){
+    dragStart: function () {
 
-        document.addEventListener('drag', function(event) {
+        document.addEventListener('drag', function (event) {
 
         }, false);
         document.addEventListener('dragstart', dom.dragStartHandler, false);
@@ -266,40 +275,40 @@ export let dom = {
 
     },
 
-    dragStartHandler: function (event){
+    dragStartHandler: function (event) {
         event.target.dataset.dragged = "true";
         let boardBody = event.target.parentElement.parentElement.parentElement;
         let dropzones = boardBody.querySelectorAll('.status > .cards');
-        for (let dropzone of dropzones){
+        for (let dropzone of dropzones) {
             dropzone.classList.add('dropzone')
         }
     },
 
-    dragEndHandler: function (event){
+    dragEndHandler: function (event) {
         event.target.dataset.dragged = "false";
     },
 
-    dragOverHandler: function (event){
+    dragOverHandler: function (event) {
         event.preventDefault();
     },
 
-     dragEnterHandler: function (event){
-        if (event.target.classList.contains("dropzone") ) {
+    dragEnterHandler: function (event) {
+        if (event.target.classList.contains("dropzone")) {
             event.target.style.background = "grey";
 
-      }
+        }
     },
 
-     dragLeaveHandler: function (event){
-         if (event.target.classList.contains("dropzone")) {
+    dragLeaveHandler: function (event) {
+        if (event.target.classList.contains("dropzone")) {
             event.target.style.background = "";
-      }
+        }
     },
 
-    dropHandler: function (event){
+    dropHandler: function (event) {
         let dragged = document.querySelector("[data-dragged='true']");
         event.preventDefault();
-        if (event.target.classList.contains('dropzone') ) {
+        if (event.target.classList.contains('dropzone')) {
             event.target.style.background = "";
             dragged.parentNode.removeChild(dragged);
             event.target.appendChild(dragged);
@@ -317,7 +326,7 @@ export let dom = {
     },
     removeDropzones: function () {
         let dropzones = document.querySelectorAll('.dropzone');
-        for (let dropzone of dropzones){
+        for (let dropzone of dropzones) {
             dropzone.classList.remove('dropzone');
         }
 

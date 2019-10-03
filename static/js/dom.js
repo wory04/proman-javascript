@@ -1,15 +1,16 @@
 // It uses data_handler.js to visualize elements
 import {dataHandler} from "./data_handler.js";
+import {sync} from "./sync.js";
 
 export let dom = {
-    _appendToElement: function (elementToExtend, textToAppend, prepend = false) {
+    _appendToElement: function (elementToExtend, textToAppend, prepend = false, referenceNode = null) {
         // function to append new DOM elements (represented by a string) to an existing DOM element
         let fakeDiv = document.createElement('div');
         fakeDiv.innerHTML = textToAppend.trim();
 
         for (let childNode of fakeDiv.childNodes) {
             if (prepend) {
-                elementToExtend.prependChild(childNode);
+                elementToExtend.insertBefore(childNode, referenceNode);
             } else {
                 elementToExtend.appendChild(childNode);
             }
@@ -25,7 +26,7 @@ export let dom = {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
-        this.dragStart();
+        this.initDrag();
 
         if (dom.isLoggedIn()) {
             let addPrivateBoardButton = document.querySelector('.private-board-add');
@@ -198,27 +199,30 @@ export let dom = {
     newCardHandler: function (event) {
         const statusId = event.target.parentElement.parentElement.querySelector('.status:first-of-type').id;
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
+        let numberOfCardsInStatus = dom.countCardsInStatus(statusContainer);
+        let newCardPosition = parseInt(numberOfCardsInStatus) + 1;
 
         dataHandler.isEntityFull('status', 'card', statusId, dom.isFull)
             .then(boolean => {
                 if (boolean.count) {
                     alert('This column has reached its maximum capacity')
                 } else {
-                    dataHandler.createNewCard(statusId, dom.cardTemplate)
+                    dataHandler.createNewCard(statusId, newCardPosition, dom.cardTemplate)
                         .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
                         .then(currentCard => dom.addEventListenersToCard(currentCard));
                 }
             });
     },
+
     renameHandler: function (event) {
         const currentName = dom.protectAgainstXSS(event.target.innerText);
         event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="20">`;
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
+        const parentId = event.target.classList[0] === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            let containerClassName = event.target.parentElement.classList[0] === 'card-title' ? event.target.parentElement.parentElement.classList[0] : event.target.parentElement.parentElement.parentElement.classList[0];
             if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
@@ -280,8 +284,7 @@ export let dom = {
             </div>`
     },
 
-
-    dragStart: function () {
+    initDrag: function () {
 
         document.addEventListener('drag', function (event) {
 
@@ -303,13 +306,17 @@ export let dom = {
         for (let dropzone of dropzones) {
             dropzone.classList.add('dropzone')
         }
+
+        sync.setDragStartCoordinates(event.pageX - event.target.offsetLeft, event.pageY - event.target.offsetTop);
     },
 
     dragEndHandler: function (event) {
         event.target.dataset.dragged = "false";
+        sync.sendDragEndData();
     },
 
     dragOverHandler: function (event) {
+        sync.sendDragData(event.target.id || event.target.parentElement.id, event.pageX, event.pageY);
         event.preventDefault();
     },
 
@@ -329,26 +336,104 @@ export let dom = {
     dropHandler: function (event) {
         let dragged = document.querySelector("[data-dragged='true']");
         event.preventDefault();
-        if (event.target.classList.contains('dropzone')) {
-            event.target.style.background = "";
+        let currentElement = event.target;
+
+        while (!currentElement.classList.contains('dropzone')) {
+            currentElement = currentElement.parentElement;
+        }
+
+        if (currentElement.classList.contains('dropzone')) {
+            currentElement.style.background = "";
             dragged.parentNode.removeChild(dragged);
-            event.target.appendChild(dragged);
-            let statusId = event.target.parentElement.id;
+            let data = dom.defineCardsPositions(event, currentElement);
+            let newCardIndex = data['cardIndex'];
+            let prependBoolean = data['boolean'];
+            let referenceChild = data['reference'];
+            let statusId = currentElement.parentElement.id;
             let cardId = dragged.id;
-            dataHandler.updateCard(statusId, cardId);
+
+            sync.sendDropData(statusId, cardId);
+
+            dataHandler.updateCard(statusId, cardId, newCardIndex)
+                .then(response => dom.cardTemplate(response))
+                .then(card => dom._appendToElement(currentElement, card, prependBoolean, referenceChild))
+                .then(() => dom.getShiftedCardsId(currentElement))
+                .then((CardsIds) => {
+                    if (CardsIds) {
+                        dataHandler.updateCards(statusId, CardsIds, newCardIndex)
+                    }
+                })
         }
         if (dragged) {
             dragged.dataset.dragged = 'false';
             dragged = null;
             dom.removeDropzones();
         }
-
     },
+
     removeDropzones: function () {
         let dropzones = document.querySelectorAll('.dropzone');
         for (let dropzone of dropzones) {
             dropzone.classList.remove('dropzone');
         }
-    }
+    },
 
+    defineCardsPositions: function (event, currentElement) {
+        let cardsOffset = dom.getCardsOffset(currentElement);
+        let mousePosition = event.clientY;
+        let data = {};
+        if (cardsOffset.length === 0) {
+            data['cardIndex'] = 0;
+            data['boolean'] = false;
+            data['reference'] = null;
+        } else {
+            data['cardIndex'] = dom.findPositionForCard(cardsOffset, mousePosition);
+            if (data['cardIndex'] === 0) {
+                data['reference'] = currentElement.children[1];
+                data['boolean'] = true;
+            } else {
+                data['reference'] = currentElement.children[data['cardIndex']];
+                data['boolean'] = true;
+            }
+        }
+        return data
+    },
+
+    getCardsOffset: function (cardsParent) {
+        let cards = cardsParent.querySelectorAll('.card');
+        let cardsOffset = [];
+        for (let card of cards) {
+            cardsOffset.push(card.getBoundingClientRect().y);
+        }
+        return cardsOffset
+    },
+
+    countCardsInStatus: function (statusContainer) {
+        return statusContainer.querySelectorAll('.card').length;
+    },
+
+    findPositionForCard: function (cardsOffset, mouseOffset) {
+        cardsOffset.push(mouseOffset);
+        cardsOffset.sort();
+        return cardsOffset.indexOf(mouseOffset)
+    },
+
+    getShiftedCardsId: function (currentElement) {
+        let cardsToUpdate = currentElement.querySelectorAll('.card');
+        if (cardsToUpdate.length > 1) {
+            let cardIdsToUpdate = [];
+            for (let cardToUpdate of cardsToUpdate) {
+                cardIdsToUpdate.push(cardToUpdate.id)
+            }
+            return cardIdsToUpdate
+        }
+    },
+
+    changeCardStatus: (statusId, cardId) => {
+        const card = document.querySelector(`.card[id="${cardId}"]`);
+        const newStatusContainer = document.querySelector(`.status[id="${statusId}"] .cards`);
+
+        card.parentNode.removeChild(card);
+        newStatusContainer.appendChild(card);
+    }
 };

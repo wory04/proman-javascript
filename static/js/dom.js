@@ -25,13 +25,22 @@ export let dom = {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
-        this.dragStart()
+        this.dragStart();
+
+        if (dom.isLoggedIn()) {
+            let addPrivateBoardButton = document.querySelector('.private-board-add');
+            addPrivateBoardButton.addEventListener('click', dom.newBoardHandler);
+        }
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
         dataHandler.getBoards(function (boards) {
             dom.showBoards(boards);
         });
+    },
+    isLoggedIn: function () {
+        let username = document.querySelector('.nav-container').dataset.user;
+        return username !== 'None';
     },
 
     isFull: function (countBoolean) {
@@ -83,18 +92,20 @@ export let dom = {
         let elementToExtend = document.getElementById('boards');
 
         for (let board of boards) {
-            let newBoard = this.boardTemplate(board);
-            this._appendToElement(elementToExtend, newBoard, false);
-            for (let statuses of board.statuses) {
-                if (statuses.length !== 0) {
-                    let newStatus = this.statusTemplate(statuses);
-                    let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
-                    this._appendToElement(statusContainer, newStatus, false);
-                    for (let card of statuses.cards) {
-                        if (card.length !== 0) {
-                            let newCard = this.cardTemplate(card);
-                            let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
-                            this._appendToElement(cardContainer, newCard, false);
+            if ([parseInt(document.querySelector('.nav-container').dataset.currentuserid), null].includes(board.user_id)) {
+                let newBoard = this.boardTemplate(board);
+                this._appendToElement(elementToExtend, newBoard, false);
+                for (let statuses of board.statuses) {
+                    if (statuses.length !== 0) {
+                        let newStatus = this.statusTemplate(statuses);
+                        let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
+                        this._appendToElement(statusContainer, newStatus, false);
+                        for (let card of statuses.cards) {
+                            if (card.length !== 0) {
+                                let newCard = this.cardTemplate(card);
+                                let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                                this._appendToElement(cardContainer, newCard, false);
+                            }
                         }
                     }
                 }
@@ -132,9 +143,10 @@ export let dom = {
         currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler);
     },
 
-    newBoardHandler: function () {
+    newBoardHandler: function (event) {
         let boards = document.querySelector('#boards');
-        dataHandler.createNewBoard(dom.boardTemplate)
+        let isPrivate = event.currentTarget.classList.contains('private-board-add');
+        dataHandler.createNewBoard(isPrivate, dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
             .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
             .then(() => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
@@ -218,7 +230,7 @@ export let dom = {
 
     boardTemplate: function (board) {
         return `
-        <div id=${board.id} class="board">
+        <div id=${board.id} class="board" data-userId="${board.user_id}">
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
                 <button class="add-status">Add Status</button>
@@ -311,7 +323,6 @@ export let dom = {
             dragged.dataset.dragged = 'false';
             dragged = null;
             dom.removeDropzones();
-
         }
 
     },
@@ -320,7 +331,6 @@ export let dom = {
         for (let dropzone of dropzones){
             dropzone.classList.remove('dropzone');
         }
-
     }
 
 };

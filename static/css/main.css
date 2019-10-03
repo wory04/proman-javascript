@@ -69,7 +69,7 @@ button{
     cursor: pointer;
 }
 
-.board-title, .board-add, .add-status, .open-board, .nav-buttons{
+.board-title, .board-add, .add-status, .add-card, .open-board, .nav-buttons, .private-board-add{
     display: inline-block;
     margin-left: 20px;
     vertical-align: center;

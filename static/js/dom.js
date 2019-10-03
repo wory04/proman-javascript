@@ -16,11 +16,21 @@ export let dom = {
         }
         return elementToExtend.lastChild;
     },
+    _deleteCard: function(cardData) {
+        const cardToRemove = document.querySelector(`.card[id="${cardData.id}"`);
+        const cardContainer = cardToRemove.parentElement;
+        cardContainer.removeChild(cardToRemove);
+    },
     init: function () {
         // This function should run once, when the page is loaded.
         let addButton = document.querySelector('.board-add');
         addButton.addEventListener('click', this.newBoardHandler);
-        this.initDrag()
+        this.initDrag();
+
+        if (dom.isLoggedIn()) {
+            let addPrivateBoardButton = document.querySelector('.private-board-add');
+            addPrivateBoardButton.addEventListener('click', dom.newBoardHandler);
+        }
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -28,6 +38,24 @@ export let dom = {
             dom.showBoards(boards);
         });
     },
+    isLoggedIn: function () {
+        let username = document.querySelector('.nav-container').dataset.user;
+        return username !== 'None';
+    },
+
+    isFull: function (countBoolean) {
+        return countBoolean;
+    },
+
+    protectAgainstXSS: function (value) {
+        let lt = /</g,
+            gt = />/g,
+            ap = /'/g,
+            ic = /"/g;
+
+        return value.toString().replace(lt, "&lt;").replace(gt, "&gt;").replace(ap, "&#39;").replace(ic, "&#34;");
+    },
+
     addNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
         for (let boardName of boardNames) {
@@ -39,6 +67,10 @@ export let dom = {
             statusName.addEventListener('click', dom.renameHandler);
         }
 
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.addEventListener('click', dom.renameHandler);
+        }
     },
     removeNamesEventListener: function () {
         let boardNames = document.querySelectorAll('.board-title');
@@ -50,6 +82,17 @@ export let dom = {
         for (let statusName of statusNames) {
             statusName.removeEventListener('click', dom.renameHandler);
         }
+
+        let cardNames = document.querySelectorAll('.card-title');
+        for (let cardName of cardNames) {
+            cardName.removeEventListener('click', dom.renameHandler);
+        }
+    },
+    addDeleteEventListener: function() {
+        let deleteButtons = document.querySelectorAll('.fas.fa-trash-alt');
+        for (let deleteButton of deleteButtons) {
+            deleteButton.addEventListener('click', dom.deleteHandler);
+        }
     },
     showBoards: function (boards) {
         // shows boards appending them to #boards div
@@ -58,18 +101,23 @@ export let dom = {
         let elementToExtend = document.getElementById('boards');
 
         for (let board of boards) {
-            let newBoard = this.boardTemplate(board);
-            this._appendToElement(elementToExtend, newBoard, false);
-            for (let statuses of board.statuses) {
-                if (statuses.length !== 0) {
-                    let newStatus = this.statusTemplate(statuses);
-                    let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
-                    this._appendToElement(statusContainer, newStatus, false);
-                    for (let card of statuses.cards) {
-                        if (card.length !== 0) {
-                            let newCard = this.cardTemplate(card);
-                            let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
-                            this._appendToElement(cardContainer, newCard, false);
+            if ([parseInt(document.querySelector('.nav-container').dataset.currentuserid), null].includes(board.user_id)) {
+                let newBoard = this.boardTemplate(board);
+                let currentBoard = this._appendToElement(elementToExtend, newBoard, false);
+                if (board.user_id !== null) {
+                    currentBoard.classList.add('private');
+                }
+                for (let statuses of board.statuses) {
+                    if (statuses.length !== 0) {
+                        let newStatus = this.statusTemplate(statuses);
+                        let statusContainer = document.querySelector(`.board[id='${board.id}'] .board-body`);
+                        this._appendToElement(statusContainer, newStatus, false);
+                        for (let card of statuses.cards) {
+                            if (card.length !== 0) {
+                                let newCard = this.cardTemplate(card);
+                                let cardContainer = document.querySelector(`.status[id='${statuses.id}'] .cards`);
+                                this._appendToElement(cardContainer, newCard, false);
+                            }
                         }
                     }
                 }
@@ -92,7 +140,8 @@ export let dom = {
         }
 
         this.addNamesEventListener();
-    },
+        this.addDeleteEventListener();
+        },
 
     addEventListenersToBoard: function (currentBoard) {
         currentBoard.querySelector('.add-card').addEventListener('click', dom.newCardHandler);
@@ -101,14 +150,26 @@ export let dom = {
         currentBoard.querySelector('.board-title').addEventListener('click', dom.renameHandler);
     },
 
-    newBoardHandler: function () {
+    addEventListenersToCard: function(currentCard) {
+        currentCard.querySelector('.fas.fa-trash-alt').addEventListener('click', dom.deleteHandler);
+        currentCard.querySelector('.card-title').addEventListener('click', dom.renameHandler);
+    },
+
+    newBoardHandler: function (event) {
         let boards = document.querySelector('#boards');
-        dataHandler.createNewBoard(dom.boardTemplate)
+        let isPrivate = event.currentTarget.classList.contains('private-board-add');
+        dataHandler.createNewBoard(isPrivate, dom.boardTemplate)
             .then((newBoard) => dom._appendToElement(boards, newBoard, false))
             .then((currentBoard) => dom.addEventListenersToBoard(currentBoard))
             .then(() => dataHandler.createNewStatus(document.querySelector('#boards .board:last-of-type')['id'], dom.statusTemplate))
             .then((newStatus) => dom._appendToElement(document.querySelector('#boards .board:last-of-type .board-body'), newStatus, false))
             .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler))
+            .then(() => {
+                let newBoard = boards.lastElementChild;
+                if (isPrivate) {
+                    newBoard.classList.add('private');
+                }
+            })
     },
 
     openBoardHandler: function (event) {
@@ -122,9 +183,16 @@ export let dom = {
         const boardId = event.target.parentElement.parentElement.id;
         const statusContainer = event.target.parentElement.nextElementSibling;
 
-        dataHandler.createNewStatus(boardId, dom.statusTemplate)
-            .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false))
-            .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler));
+        dataHandler.isEntityFull('board', 'status', boardId, dom.isFull)
+            .then(boolean => {
+                if (boolean.count) {
+                    alert('This board has reached its maximum capacity');
+                } else {
+                    dataHandler.createNewStatus(boardId, dom.statusTemplate)
+                        .then((newStatus) => dom._appendToElement(statusContainer, newStatus, false))
+                        .then((currentStatus) => currentStatus.querySelector('.status-title').addEventListener('click', dom.renameHandler));
+                }
+            });
     },
 
     newCardHandler: function (event) {
@@ -132,23 +200,32 @@ export let dom = {
         const statusContainer = event.target.parentElement.parentElement.querySelector('.cards');
         let numberOfCardsInStatus = dom.countCardsInStatus(statusContainer);
         let newCardPosition = parseInt(numberOfCardsInStatus) + 1;
-        dataHandler.createNewCard(statusId, newCardPosition, dom.cardTemplate)
-            .then((newCard) => dom._appendToElement(statusContainer, newCard, false)
-            );
+
+        dataHandler.isEntityFull('status', 'card', statusId, dom.isFull)
+            .then(boolean => {
+                if (boolean.count) {
+                    alert('This column has reached its maximum capacity')
+                } else {
+                    dataHandler.createNewCard(statusId, newCardPosition, dom.cardTemplate)
+                        .then((newCard) => dom._appendToElement(statusContainer, newCard, false))
+                        .then(currentCard => dom.addEventListenersToCard(currentCard));
+                }
+            });
     },
 
     renameHandler: function (event) {
-        const currentName = event.target.innerText;
-        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="12">`;
+        const currentName = dom.protectAgainstXSS(event.target.innerText);
+        event.target.innerHTML = `<input type="text" placeholder="${currentName}" required maxlength="20">`;
         dom.removeNamesEventListener();
 
         const inputField = document.querySelector('input');
-        const parentId = event.target.parentElement.parentElement.id;
+        const parentId = event.target.className === 'card-title' ? event.target.parentElement.id : event.target.parentElement.parentElement.id;
         inputField.addEventListener('keyup', function (event) {
-                if (event.code === 'Enter') {
+            let containerClassName = event.target.parentElement.className === 'card-title' ? event.target.parentElement.parentElement.className : event.target.parentElement.parentElement.parentElement.className;
+            if (event.code === 'Enter') {
                     try {
                         if (event.target.checkValidity()) {
-                            dataHandler.renameTitle(parentId, inputField.value, event.target.parentElement.parentElement.parentElement.className)
+                            dataHandler.renameTitle(parentId, dom.protectAgainstXSS(inputField.value), containerClassName)
                                 .then(response => event.target.parentElement.innerHTML = response.title)
                                 .then(function () {
                                     dom.addNamesEventListener();
@@ -166,10 +243,15 @@ export let dom = {
             }
         )
     },
+    deleteHandler: function(event) {
+        const cardId = event.target.parentElement.parentElement.id;
+        dataHandler.deleteCard(cardId)
+            .then(deletedCard => dom._deleteCard(deletedCard))
+    },
 
     boardTemplate: function (board) {
         return `
-        <div id=${board.id} class="board">
+        <div id=${board.id} class="board" data-userId="${board.user_id}">
             <div class="board-header">
                 <span class="board-title">${board.title}</span>
                 <button class="add-status">Add Status</button>

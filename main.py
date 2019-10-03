@@ -1,9 +1,10 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, session, jsonify, make_response
 from util import json_response
 
 import data_handler
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route("/")
@@ -11,7 +12,9 @@ def index():
     """
     This is a one-pager which shows all the boards and cards
     """
-    return render_template('index.html')
+    username = session.get('username')
+    user_id = data_handler.get_user_id(username)['id'] if username else None
+    return render_template('index.html', username=username, user_id=user_id)
 
 
 @app.route("/get-boards")
@@ -47,6 +50,14 @@ def create_board():
     return data_handler.create_new_board()
 
 
+@app.route('/private-board', methods=['POST'])
+@json_response
+def create_private_board():
+    username = session.get('username')
+    user_id = data_handler.get_user_id(username)['id']
+    return data_handler.create_new_board(user_id)
+
+
 @app.route('/board/<id>', methods=['PATCH'])
 @json_response
 def rename_board(id):
@@ -61,6 +72,30 @@ def rename_status(id):
     return data_handler.rename_status(status_data)
 
 
+@app.route('/card/<id>', methods=['PATCH', 'DELETE'])
+@json_response
+def manipulate_card(id):
+    if request.method == 'PATCH':
+        card_data = request.get_json()
+        return data_handler.rename_card(card_data)
+    elif request.method == 'DELETE':
+        return data_handler.delete_card(id)
+
+
+@app.route('/board/<id>/status', methods=['POST'])
+@json_response
+def check_number_of_statuses_by_board_id(id):
+    data = request.get_json()
+    return data_handler.is_full('board_id', data)
+
+
+@app.route('/status/<id>/card', methods=['POST'])
+@json_response
+def check_number_of_statuses_by_status_id(id):
+    data = request.get_json()
+    return data_handler.is_full('status_id', data)
+
+
 @app.route('/card/move', methods=['PATCH'])
 def card_move():
     moved_card = request.get_json()
@@ -71,6 +106,38 @@ def card_move():
 def cards_move():
     moved_cards = request.get_json()
     return data_handler.move_cards(moved_cards)
+
+
+@app.route('/registration', methods=['POST'])
+def route_registration():
+    user_data = request.get_json()
+    new_user = data_handler.new_registration(user_data)
+
+    if new_user:
+        response = {'id': new_user['id'], 'name': new_user['name'], 'message': "Successful registration!"}
+        return make_response(jsonify(response), 201)
+    else:
+        return make_response(jsonify({"message": "This username is already taken! Please choose another one!"}), 406)
+
+
+@app.route('/login', methods=['POST'])
+def route_login():
+    user_data = request.get_json()
+
+    if data_handler.validate_login(user_data):
+        session['username'] = user_data['username']
+        response = {"message": "You are logged in!"}
+        return make_response(jsonify(response), 200)
+
+    response = {"message": "Login failed! Invalid credentials!"}
+    return make_response(jsonify(response), 401)
+
+
+@app.route('/logout', methods=['POST'])
+def route_logout():
+    session.pop('username')
+    response = {"message": "You successfully logged out!"}
+    return make_response(jsonify(response), 200)
 
 
 def main():

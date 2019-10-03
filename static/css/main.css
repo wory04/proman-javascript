@@ -26,6 +26,8 @@ h1{
     font-size: 4em;
     letter-spacing: 5px;
     transform: scale(1.2, 1);
+    margin-top: 100px;
+    color: #494454;
 }
 
 button{
@@ -57,19 +59,24 @@ button{
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
+.private .board-header{
+    background: #D7E5E8;
+}
+
 .board-title{
     margin: 13px;
     display: inline-block;
     font-size: 20px;
 }
 
-.board-title:hover, .status-title:hover{
+.board-title:hover, .status-title:hover, .card-title:hover{
     cursor: pointer;
 }
 
-.board-title, .board-add, .add-status, .open-board{
+.board-title, .board-add, .add-status, .add-card, .open-board, .nav-buttons, .private-board-add{
     display: inline-block;
     margin-left: 20px;
+    vertical-align: center;
 }
 
 .open-board{
@@ -80,7 +87,7 @@ button{
 .board-body{
     display: flex;
     flex-wrap: nowrap;
-    background-color: rgb(255, 233, 209, 0.6);
+    background-color: rgba(255, 233, 209, 0.6);
 }
 
 .board-body.hide{
@@ -99,7 +106,7 @@ button{
 .cards:empty{
     /*This only works if the tag is really empty and there is not even whitespace inside*/
     border: 4px solid #cdcdcd;
-    margin-top: 4px;
+    margin: 4px 0;
     border-radius: 10px;
     background: #eee;
 }
@@ -113,7 +120,7 @@ button{
     background: #222;
     color: #fff;
     border-radius: var(--border-radius);
-    margin: 4px 0;
+    margin: 10px 0;
     padding: 4px;
 }
 
@@ -160,4 +167,9 @@ button{
 
 .card-title{
     padding-right: 16px;
+    margin: 0;
+}
+
+.navbar{
+    background-color: #494454;
 }

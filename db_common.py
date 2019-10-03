@@ -70,16 +70,16 @@ def update_title_by_id(cursor, id_number, title, table):
 
 
 @db_connection.connection_handler
-def update_card(cursor, status_id, card_id):
+def update_card(cursor, status_id, card_id, card_position):
     cursor.execute(
         sql.SQL(
             """
             UPDATE card
-            SET status_id = %(status_id)s
+            SET status_id = %(status_id)s, position = %(card_position)s
             WHERE id = %(card_id)s
             RETURNING *;
             """
-        ), {'status_id': status_id, 'card_id': card_id})
+        ), {'status_id': status_id, 'card_position': card_position, 'card_id': card_id})
     result = cursor.fetchone()
     return result
 
@@ -94,6 +94,52 @@ def insert_into_card_table(cursor, status_id, card_position):
             RETURNING *;
             """
         ), [status_id, card_position]
+    )
+    result = cursor.fetchone()
+    return result
+
+
+@db_connection.connection_handler
+def update_cards_position(cursor, card_id, shift_number):
+    cursor.execute(
+        sql.SQL(
+            """
+            Update card
+            set position = position + %(shift_number)s 
+            where id = %(card_id)s;
+            """
+        ), {'card_id': card_id, "shift_number": shift_number}
+    )
+
+
+@db_connection.connection_handler
+def get_cards_to_modify_position(cursor, card_id, old_status_id):
+    cursor.execute(
+        sql.SQL(
+            """
+            SELECT id
+            FROM card
+            WHERE status_id = %(old_status_id)s 
+            AND position > (SELECT position
+                            FROM card
+                            WHERE id = %(card_id)s);                   
+            """
+        ), {"card_id": card_id, "old_status_id": old_status_id}
+    )
+    result = cursor.fetchall()
+    return result
+
+
+@db_connection.connection_handler
+def get_old_status_id(cursor, card_id):
+    cursor.execute(
+        sql.SQL(
+            """
+            SELECT status_id
+            FROM card
+            WHERE id = %(card_id)s;
+            """
+        ), {"card_id": card_id}
     )
     result = cursor.fetchone()
     return result

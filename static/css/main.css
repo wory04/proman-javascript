@@ -94,6 +94,7 @@ button{
 
 .cards{
     min-height: 49px;
+    padding: 10px;
 }
 
 .cards:empty{
